@@ -316,7 +316,6 @@ class ParallelWorker(QThread):
             t.join()
 
         self.finished.emit()
-
 class FullscreenApp(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -347,7 +346,7 @@ class FullscreenApp(QMainWindow):
         container = QWidget()
         container.setStyleSheet("background-color: #292929;")
         main_layout = QVBoxLayout(container)
-        main_layout.setContentsMargins(40, 40, 40, 40)
+        main_layout.setContentsMargins(20, 20, 20, 20)  # Reduzierte Margins
         main_layout.setSpacing(20)
         self.setCentralWidget(container)
 
@@ -430,7 +429,7 @@ class FullscreenApp(QMainWindow):
         page = QWidget()
         page.setStyleSheet("background-color: #333333;")
         main_layout = QVBoxLayout(page)
-        main_layout.setContentsMargins(40, 30, 40, 30)
+        main_layout.setContentsMargins(20, 20, 20, 20)  # Reduzierte Margins
         main_layout.setSpacing(25)
 
         # Header mit Logo und Sprachbuttons
@@ -727,7 +726,6 @@ class FullscreenApp(QMainWindow):
     def check_storage(self):
         QMessageBox.information(self, "Speicher-Prüfung", "Speicher wird geprüft...")
 
-    # Die restlichen Methoden bleiben unverändert...
     def convert_to_pixmap(self, frame, width=300, height=300):
         if frame is None or (isinstance(frame, np.ndarray) and np.all(frame == 0)):
             gray_pixmap = QPixmap(width, height)
@@ -1075,6 +1073,8 @@ class FullscreenApp(QMainWindow):
         if idx > 0:
             self.stack.setCurrentIndex(idx - 1)
             self.update_buttons()
+            # Füge diese Zeile hinzu, um das Layout zu stabilisieren
+            self.centralWidget().updateGeometry()
 
     def go_next(self):
         idx = self.stack.currentIndex()
@@ -1168,13 +1168,13 @@ class FullscreenApp(QMainWindow):
 
         if current_index == 0:
             self.back_btn.hide()
-            self.next_btn.show()
+            self.next_btn.hide()  # Zeige den Next-Button auf der Startseite
         elif current_index == total_pages - 1:
             self.back_btn.show()
-            self.next_btn.hide()
+            self.next_btn.hide()  # Verstecke Next-Button auf der letzten Seite
         else:
             self.back_btn.show()
-            self.next_btn.show()
+            self.next_btn.show()  # Zeige beide Buttons auf allen anderen Seiten
     
     def start_worker(self):
         self.worker = ParallelWorker(self.images)
@@ -1199,7 +1199,7 @@ class FullscreenApp(QMainWindow):
                     print(f"Fehler beim Berechnen der Gesamt-Abmessung: {e}")
                     self.abmessung_gesamt = "Undefiniert"
 
-                print(f"🔹 Gesamt-Abmessung: {self.abmessung_gesamt}")
+                print(f"Gesamt-Abmessung: {self.abmessung_gesamt}")
                 self.abmessung = self.abmessung_gesamt
 
                 for idx, dim in enumerate(data):
@@ -1258,13 +1258,15 @@ class FullscreenApp(QMainWindow):
             self.load_pages()
             self.stack.setCurrentIndex(2)
             self.update_buttons()
+            # Füge diese Zeile hinzu
+            QApplication.processEvents()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Left:
             self.go_back()
         elif event.key() == Qt.Key.Key_Right:
             self.go_next()
-
+        
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     w = FullscreenApp()
