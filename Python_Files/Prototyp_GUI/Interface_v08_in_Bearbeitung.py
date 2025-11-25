@@ -346,20 +346,23 @@ class FullscreenApp(QMainWindow):
         container = QWidget()
         container.setStyleSheet("background-color: #292929;")
         main_layout = QVBoxLayout(container)
-        main_layout.setContentsMargins(20, 20, 20, 20)  # Reduzierte Margins
-        main_layout.setSpacing(20)
+        main_layout.setContentsMargins(20, 20, 20, 10)  # Untere Margin reduziert auf 10
+        main_layout.setSpacing(10)  # Spacing reduziert
         self.setCentralWidget(container)
 
         # Stacked widget für die Seiten
         self.stack = QStackedWidget()
         main_layout.addWidget(self.stack, stretch=1)
 
-        # Button-Leiste (fix am unteren Rand)
+        # Button-Leiste (fix am unteren Rand) - Höher positioniert
         bar_layout = QHBoxLayout()
+        bar_layout.setContentsMargins(0, 0, 0, 0)  # Keine Margins für die Bar
+        bar_layout.setSpacing(10)
+        
         self.back_btn = QPushButton("←")
         self.next_btn = QPushButton("→")
-        self.back_btn.setFixedSize(100, 60)
-        self.next_btn.setFixedSize(100, 60)
+        self.back_btn.setFixedSize(100, 50)  # Höhe reduziert
+        self.next_btn.setFixedSize(100, 50)  # Höhe reduziert
         font = self.back_btn.font()
         font.setPointSize(26)
         self.back_btn.setFont(font)
@@ -429,7 +432,7 @@ class FullscreenApp(QMainWindow):
         page = QWidget()
         page.setStyleSheet("background-color: #333333;")
         main_layout = QVBoxLayout(page)
-        main_layout.setContentsMargins(20, 20, 20, 20)  # Reduzierte Margins
+        main_layout.setContentsMargins(20, 20, 20, 20)
         main_layout.setSpacing(25)
 
         # Header mit Logo und Sprachbuttons
@@ -1143,9 +1146,17 @@ class FullscreenApp(QMainWindow):
             self.worker.finished.connect(finish_loading)
 
             def cancel_loading():
+                # WICHTIG: Trenne alle Verbindungen zuerst
+                try:
+                    self.worker.output_received.disconnect()
+                    self.worker.finished.disconnect()
+                except:
+                    pass  # Falls nicht verbunden, ignoriere Fehler
+                
                 if self.worker.isRunning():
                     self.worker.terminate()
                     self.worker.wait()
+                
                 self.loading_dialog.reject()
                 self.stack.setCurrentIndex(1)
                 self.update_buttons()
@@ -1168,7 +1179,7 @@ class FullscreenApp(QMainWindow):
 
         if current_index == 0:
             self.back_btn.hide()
-            self.next_btn.hide()  # Zeige den Next-Button auf der Startseite
+            self.next_btn.hide()  # Korrektur: Beide Buttons auf Startseite verstecken
         elif current_index == total_pages - 1:
             self.back_btn.show()
             self.next_btn.hide()  # Verstecke Next-Button auf der letzten Seite
@@ -1265,8 +1276,7 @@ class FullscreenApp(QMainWindow):
         if event.key() == Qt.Key.Key_Left:
             self.go_back()
         elif event.key() == Qt.Key.Key_Right:
-            self.go_next()
-        
+            self.go_next()        
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     w = FullscreenApp()
