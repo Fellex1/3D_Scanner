@@ -30,7 +30,7 @@ class TranslationManager:
                     "subtitle": "Interface um den 3D-Scanner zu bedienen",
                     "instruction1": "Bitte lege den Artikel der gescannt werden soll in die Box ein",
                     "instruction2": "Stellen Sie sicher, dass der Artikel vollständig im Sichtfeld aller Kameras liegt",
-                    "instruction3": "Maximale Größe: 50×50×50 cm",
+                    "instruction3": "Maximale Größe: 50x50x50 cm",
                     "instruction4": "Maximales Gewicht: 20 kg",
                     "scan_btn": "Scan Starten",
                     "save_btn": "Lokal speichern",
@@ -46,13 +46,11 @@ class TranslationManager:
                     "connected": "Verbunden",
                     "available": "Verfügbar",
                     "refresh_btn": "Status aktualisieren"
-                },
-                "photo": {
+                },"photo": {
                     "title": "Foto-Auswahl",
                     "retry_btn": "Wiederholen",
                     "discard_btn": "Verwerfen"
-                },
-                "overview": {
+                },"overview": {
                     "title": "Kamera-Übersicht",
                     "dimensions": "Abmessungen:",
                     "weight": "Gewicht:",
@@ -66,14 +64,13 @@ class TranslationManager:
                     "sap_btn": "SAP-Eintrag",
                     "save_btn": "Lokal speichern"
                 }
-            },
-            "en": {
+            },"en": {
                 "start": {
                     "title": "3D Scanner Interface",
                     "subtitle": "Interface to operate the 3D scanner",
                     "instruction1": "Please place the item to be scanned in the box",
                     "instruction2": "Make sure the item is completely in the field of view of all cameras", 
-                    "instruction3": "Maximum size: 50×50×50 cm",
+                    "instruction3": "Maximum size: 50x50x50 cm",
                     "instruction4": "Maximum weight: 20 kg",
                     "scan_btn": "Start Scan",
                     "save_btn": "Save Locally",
@@ -89,13 +86,11 @@ class TranslationManager:
                     "connected": "Connected",
                     "available": "Available",
                     "refresh_btn": "Refresh Status"
-                },
-                "photo": {
+                },"photo": {
                     "title": "Photo Selection",
                     "retry_btn": "Retake",
                     "discard_btn": "Discard"
-                },
-                "overview": {
+                },"overview": {
                     "title": "Camera Overview", 
                     "dimensions": "Dimensions:",
                     "weight": "Weight:",
@@ -109,14 +104,13 @@ class TranslationManager:
                     "sap_btn": "SAP Entry",
                     "save_btn": "Save Locally"
                 }
-            },
-            "it": {
+            },"it": {
                 "start": {
                     "title": "Interfaccia Scanner 3D",
                     "subtitle": "Interfaccia per gestire lo scanner 3D",
                     "instruction1": "Si prega di posizionare l'articolo nella scatola",
                     "instruction2": "Assicurarsi che l'articolo sia completamente nel campo visivo di tutte le telecamere",
-                    "instruction3": "Dimensione massima: 50×50×50 cm",
+                    "instruction3": "Dimensione massima: 50x50x50 cm",
                     "instruction4": "Peso massimo: 20 kg",
                     "scan_btn": "Avvia Scan", 
                     "save_btn": "Salva localmente",
@@ -132,20 +126,17 @@ class TranslationManager:
                     "connected": "Connesso",
                     "available": "Disponibile",
                     "refresh_btn": "Aggiorna Stato"
-                },
-                "photo": {
+                },"photo": {
                     "title": "Selezione Foto",
                     "retry_btn": "Ripeti",
                     "discard_btn": "Scarta"
-                },
-                "overview": {
+                },"overview": {
                     "title": "Panoramica Fotocamera",
                     "dimensions": "Dimensioni:",
                     "weight": "Peso:",
                     "mm": "mm", 
                     "kg": "kg"
-                },
-                "storage": {
+                },"storage": {
                     "title": "Opzioni di Memorizzazione",
                     "barcode_label": "Barcode:",
                     "barcode_type": "Tipo di barcode:",
@@ -174,7 +165,7 @@ class CameraManager:
     
     def _enable_flash(self):
         # BLITZ-IMPLEMENTIERUNG HIER EINFÜGEN
-        # GPIO, serielle Schnittstelle oder kamerainterner Blitz
+        # GPIO, serielle Schnittstelle
         pass
     
     def _disable_flash(self):
@@ -196,14 +187,10 @@ class CameraManager:
             if not cap.isOpened():
                 return self._make_placeholder()
             
-            # Blitz hier aktivieren wenn gewünscht
-            # self._enable_flash()
-            
+            self._enable_flash()
             ret, frame = cap.read()
             cap.release()
-            
-            # Blitz hier deaktivieren
-            # self._disable_flash()
+            self._disable_flash()
             
             return frame if ret else self._make_placeholder()
             
@@ -336,28 +323,29 @@ class FullscreenApp(QMainWindow):
         self.setWindowTitle("3D-Scanner")
         self.showFullScreen()
 
-        #Erst-Anpassung------------------------------------------------------
-        self.camera = CameraManager(debug_single_camera=True)  # True = 1 Kamera, False = 4 Kameras
+        # Erst-Anpassung------------------------------------------------------
+        self.camera = CameraManager(debug_single_camera=True)
         self.translator = TranslationManager()
 
-        self.language = "de"  # oder "it" / "en" standartmäßig
+        self.language = "de"
         self.Explorer_Structure = r"GUI_Anzeige"
 
         self.abmessung = None
         self.gewicht = None
         self.barcode = None
 
-        self.images = [None]*4              # Platzhalter für die 4 Bilder
-        self.image_labels = [None]*4        # Labels für die Bilder
-        self.final_images = [None]*4        # Für Übersicht
-        self.final_image_labels = [None]*4  #Labels für die fertigen Bilder
+        self.images = [None]*4
+        self.image_labels = [None]*4
+        self.final_images = [None]*4
+        self.final_image_labels = [None]*4
 
-        self.keep = [True]*4        # True = Bild behalten, False = Bild verworfen 
+        self.keep = [True]*4
         self.scan_start = False
-        self.bilder_namen = ["iso_Bild", "top_Bild", "right_Bild", "behind_Bild"]   
+        self.bilder_namen = ["iso_Bild", "top_Bild", "right_Bild", "behind_Bild"]
 
         # Hauptcontainer
         container = QWidget()
+        container.setStyleSheet("background-color: #292929;")
         main_layout = QVBoxLayout(container)
         main_layout.setContentsMargins(40, 40, 40, 40)
         main_layout.setSpacing(20)
@@ -371,14 +359,34 @@ class FullscreenApp(QMainWindow):
         bar_layout = QHBoxLayout()
         self.back_btn = QPushButton("←")
         self.next_btn = QPushButton("→")
-        self.back_btn.setFixedSize(100, 60)  # Breite x Höhe
+        self.back_btn.setFixedSize(100, 60)
         self.next_btn.setFixedSize(100, 60)
         font = self.back_btn.font()
-        font.setPointSize(26)  # Schriftgröße
+        font.setPointSize(26)
         self.back_btn.setFont(font)
         self.next_btn.setFont(font)
         self.back_btn.clicked.connect(self.go_back)
         self.next_btn.clicked.connect(self.go_next)
+
+        # Navigation-Buttons Styling
+        nav_style = """
+            QPushButton {
+                font-size: 26px;
+                font-weight: bold;
+                background: #3498db;
+                color: #ecf0f1;
+                border: none;
+                border-radius: 8px;
+            }
+            QPushButton:hover {
+                background: #2980b9;
+            }
+            QPushButton:pressed {
+                background: #21618c;
+            }
+        """
+        self.back_btn.setStyleSheet(nav_style)
+        self.next_btn.setStyleSheet(nav_style)
 
         bar_layout.addWidget(self.back_btn)
         bar_layout.addStretch()
@@ -402,15 +410,326 @@ class FullscreenApp(QMainWindow):
         btn.setFixedSize(40, 40)
         btn.setStyleSheet("""
             QToolButton {
-                border-radius: 20px;  /* rund */
-            }""")
+                background: #323f4d;
+                border: 2px solid #5d6d7e;
+                border-radius: 6px;
+                padding: 5px;
+            }
+            QToolButton:hover {
+                background: #3d566e;
+                border: 2px solid #3498db;
+            }
+            QToolButton:pressed {
+                background: #21618c;
+            }
+        """)
         btn.clicked.connect(lambda _, lang=language_code: self.set_language(lang))
         return btn
-                
+
+    def create_start_page(self):
+        page = QWidget()
+        page.setStyleSheet("background-color: #333333;")
+        main_layout = QVBoxLayout(page)
+        main_layout.setContentsMargins(40, 30, 40, 30)
+        main_layout.setSpacing(25)
+
+        # Header mit Logo und Sprachbuttons
+        header_widget = self.create_start_header()
+        main_layout.addWidget(header_widget)
+
+        # Hauptinhalt mit zwei Spalten
+        content_widget = QWidget()
+        content_layout = QHBoxLayout(content_widget)
+        content_layout.setSpacing(40)
+        content_layout.setContentsMargins(0, 20, 0, 0)
+
+        # Linke Spalte - Hauptinformationen
+        left_column = self.create_start_left_column()
+        content_layout.addWidget(left_column, stretch=3)
+
+        # Rechte Spalte - Systemstatus
+        right_column = self.create_start_right_column()
+        content_layout.addWidget(right_column, stretch=2)
+
+        main_layout.addWidget(content_widget, stretch=1)
+        
+        return page
+
+    def create_start_header(self):
+        header_widget = QWidget()
+        header_layout = QHBoxLayout(header_widget)
+        header_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Logo links
+        logo_label = QLabel()
+        logo_path = os.path.join(self.Explorer_Structure, "logo.png")
+        if os.path.exists(logo_path):
+            pixmap = QPixmap(logo_path)
+            pixmap = pixmap.scaled(150, 80, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            logo_label.setPixmap(pixmap)
+        else:
+            logo_label.setText("3D-SCANNER")
+            logo_label.setStyleSheet("""
+                color: #ecf0f1; 
+                font-size: 24px; 
+                font-weight: bold;
+                font-family: Arial;
+                padding: 10px;
+                background: #323f4d;
+                border-radius: 6px;
+            """)
+        logo_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        header_layout.addWidget(logo_label)
+        
+        header_layout.addStretch()
+        
+        # Sprachbuttons rechts
+        lang_widget = QWidget()
+        lang_layout = QHBoxLayout(lang_widget)
+        lang_layout.setSpacing(8)
+        lang_layout.setContentsMargins(0, 0, 0, 0)
+        
+        btn_de = self.create_flag_button("de.png", "de")
+        btn_it = self.create_flag_button("it.png", "it") 
+        btn_en = self.create_flag_button("en.png", "en")
+
+        for btn in [btn_de, btn_it, btn_en]:
+            lang_layout.addWidget(btn)
+
+        header_layout.addWidget(lang_widget)
+        return header_widget
+
+    def create_start_left_column(self):
+        left_column = QWidget()
+        left_layout = QVBoxLayout(left_column)
+        left_layout.setSpacing(25)
+        
+        # Titel
+        title_label = QLabel(self.translator.get_text(self.language, "start", "title"))
+        title_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        title_label.setStyleSheet("""
+            font-size: 36px; 
+            font-weight: bold; 
+            color: #3498db;
+            margin-bottom: 10px;
+            font-family: Arial;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #5d6d7e;
+        """)
+        left_layout.addWidget(title_label)
+
+        # Untertitel
+        subtitle_label = QLabel(self.translator.get_text(self.language, "start", "subtitle"))
+        subtitle_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        subtitle_label.setWordWrap(True)
+        subtitle_label.setStyleSheet("""
+            color: #bdc3c7; 
+            font-size: 18px; 
+            padding: 15px 0; 
+            line-height: 1.4;
+        """)
+        left_layout.addWidget(subtitle_label)
+
+        # Anweisungen
+        instructions_widget = QWidget()
+        instructions_layout = QVBoxLayout(instructions_widget)
+        instructions_layout.setSpacing(12)
+        
+        texts = [
+            self.translator.get_text(self.language, "start", "instruction1"),
+            self.translator.get_text(self.language, "start", "instruction2"),
+            self.translator.get_text(self.language, "start", "instruction3"),
+            self.translator.get_text(self.language, "start", "instruction4")
+        ]
+        
+        for i, text in enumerate(texts):
+            instruction_frame = QFrame()
+            instruction_frame.setStyleSheet("""
+                QFrame {
+                    background: #323f4d;
+                    border: 1px solid #5d6d7e;
+                    border-radius: 6px;
+                    padding: 15px;
+                }
+            """)
+            frame_layout = QHBoxLayout(instruction_frame)
+            
+            # Text
+            label = QLabel(text)
+            label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+            label.setWordWrap(True)
+            label.setStyleSheet("color: #ecf0f1; font-size: 16px; line-height: 1.4;")
+            frame_layout.addWidget(label, stretch=1)
+            
+            instructions_layout.addWidget(instruction_frame)
+
+        left_layout.addWidget(instructions_widget)
+        left_layout.addStretch()
+
+        # Aktion-Buttons
+        button_widget = QWidget()
+        button_layout = QHBoxLayout(button_widget)
+        button_layout.setSpacing(20)
+        
+        scan_btn = QPushButton(self.translator.get_text(self.language, "start", "scan_btn"))
+        save_btn = QPushButton(self.translator.get_text(self.language, "start", "save_btn"))
+        
+        # Scan-Button - Primäre Aktion
+        scan_btn.setStyleSheet("""
+            QPushButton {
+                font-size: 18px;
+                font-weight: 600;
+                padding: 16px 35px;
+                border: none;
+                border-radius: 6px;
+                background: #3498db;
+                color: #ecf0f1;
+                min-width: 180px;
+            }
+            QPushButton:hover {
+                background: #2980b9;
+            }
+            QPushButton:pressed {
+                background: #21618c;
+            }
+        """)
+        
+        # Save-Button - Sekundäre Aktion
+        save_btn.setStyleSheet("""
+            QPushButton {
+                font-size: 18px;
+                font-weight: 600;
+                padding: 16px 35px;
+                border: 2px solid #5d6d7e;
+                border-radius: 6px;
+                background: #323f4d;
+                color: #ecf0f1;
+                min-width: 180px;
+            }
+            QPushButton:hover {
+                background: #3d566e;
+                color: #ecf0f1;
+            }
+            QPushButton:pressed {
+                background: #21618c;
+            }
+        """)
+        
+        for btn in [scan_btn, save_btn]:
+            btn.setFixedHeight(55)
+            button_layout.addWidget(btn)
+
+        scan_btn.clicked.connect(self.go_next)
+        left_layout.addWidget(button_widget)
+
+        return left_column
+
+    def create_start_right_column(self):
+        right_column = QFrame() #323f4d
+        right_column.setStyleSheet("""
+            QFrame {
+                background: #323f4d; 
+                border: 1px solid #5d6d7e;
+                border-radius: 8px;
+                padding: 20px;
+            }
+        """)
+        right_layout = QVBoxLayout(right_column)
+        right_layout.setSpacing(20)
+
+        # Status-Überschrift
+        status_title = QLabel(self.translator.get_text(self.language, "start", "status_title"))
+        status_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        status_title.setStyleSheet("""
+            font-size: 22px; 
+            font-weight: 600; 
+            color: #3498db;
+            padding: 10px 0;
+            border-bottom: 1px solid #5d6d7e;
+        """)
+        right_layout.addWidget(status_title)
+
+        # Status-Buttons
+        status_buttons = [
+            (self.translator.get_text(self.language, "start", "check_camera"), self.check_camera),
+            (self.translator.get_text(self.language, "start", "check_light"), self.check_light),
+            (self.translator.get_text(self.language, "start", "check_measure"), self.check_measure),
+            (self.translator.get_text(self.language, "start", "calibrate_scale"), self.calibrate_scale),
+            (self.translator.get_text(self.language, "start", "check_storage"), self.check_storage)
+        ]
+
+        for name, callback in status_buttons:
+            status_button = self.create_status_button(name, callback)
+            right_layout.addWidget(status_button)
+
+        right_layout.addStretch()
+
+        # Refresh Button
+        refresh_btn = QPushButton(self.translator.get_text(self.language, "start", "refresh_btn"))
+        refresh_btn.setStyleSheet("""
+            QPushButton {
+                font-size: 14px; 
+                padding: 12px; 
+                background: #333333;
+                color: #ecf0f1; 
+                border: 1px solid #5d6d7e; 
+                border-radius: 6px;
+            }
+            QPushButton:hover {
+                background: #3498db;
+                color: #ecf0f1;
+            }
+        """)
+        refresh_btn.setFixedHeight(45)
+        right_layout.addWidget(refresh_btn)
+
+        return right_column
+
+    def create_status_button(self, name, callback):
+        button = QPushButton(name)
+        button.setStyleSheet("""
+            QPushButton {
+                font-size: 14px;
+                font-weight: 500;
+                padding: 12px 15px;
+                border: 1px solid #5d6d7e;
+                border-radius: 6px;
+                background: #333333;
+                color: #ecf0f1;
+                text-align: left;
+            }
+            QPushButton:hover {
+                background: #3498db;
+                border-color: #3498db;
+            }
+            QPushButton:pressed {
+                background: #21618c;
+            }
+        """)
+        button.setFixedHeight(45)
+        if callback:
+            button.clicked.connect(callback)
+        return button
+
+    # Platzhalter-Funktionen für die Systemprüfung
+    def check_camera(self):
+        QMessageBox.information(self, "Kamera-Prüfung", "Kamera-System wird geprüft...")
+
+    def check_light(self):
+        QMessageBox.information(self, "Beleuchtungs-Prüfung", "Beleuchtung wird geprüft...")
+
+    def check_measure(self):
+        QMessageBox.information(self, "Mess-System-Prüfung", "Mess-System wird geprüft...")
+
+    def calibrate_scale(self):
+        QMessageBox.information(self, "Waagen-Kalibrierung", "Waage wird kalibriert...")
+
+    def check_storage(self):
+        QMessageBox.information(self, "Speicher-Prüfung", "Speicher wird geprüft...")
+
+    # Die restlichen Methoden bleiben unverändert...
     def convert_to_pixmap(self, frame, width=300, height=300):
-        # Prüfe ob es ein Platzhalter-Bild ist (schwarzes Bild)
         if frame is None or (isinstance(frame, np.ndarray) and np.all(frame == 0)):
-            # Erstelle einen grauen Platzhalter
             gray_pixmap = QPixmap(width, height)
             gray_pixmap.fill(Qt.GlobalColor.lightGray)
             return gray_pixmap
@@ -423,7 +742,7 @@ class FullscreenApp(QMainWindow):
         return pixmap.scaled(width, height, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
 
     def retry_image(self, idx):
-        print(f"🔄 Wiederhole Bild {idx+1}")
+        print(f"Wiederhole Bild {idx+1}")
         self.scan_start = True
         new_img = self.camera.take_picture(idx)
         if new_img is not None:
@@ -432,155 +751,13 @@ class FullscreenApp(QMainWindow):
             self.image_labels[idx].setPixmap(pixmap)
 
     def discard_image(self, idx):
-        print(f"❌ Verworfen Bild {idx+1}")
+        print(f"Verworfen Bild {idx+1}")
         self.scan_start = True
         self.keep[idx] = False
         label = self.image_labels[idx]
         gray_pixmap = QPixmap(label.pixmap().size())
         gray_pixmap.fill(Qt.GlobalColor.lightGray)
         label.setPixmap(gray_pixmap)
-
-    def create_start_page(self):
-        page = QWidget()
-        main_layout = QHBoxLayout(page)
-        main_layout.setSpacing(30)
-        main_layout.setContentsMargins(40, 40, 40, 40)
-
-        # Linke Spalte (2/3)
-        left_column = self.create_start_left_column()
-        main_layout.addWidget(left_column, stretch=2)
-
-        # Rechte Spalte (1/3) - Status
-        right_column = self.create_start_right_column()
-        main_layout.addWidget(right_column, stretch=1)
-
-        return page
-
-    def create_start_left_column(self):
-        left_column = QWidget()
-        left_layout = QVBoxLayout(left_column)
-        left_layout.setSpacing(20)
-        
-        # Titel
-        title_label = QLabel(self.translator.get_text(self.language, "start", "title"))
-        title_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        title_label.setStyleSheet("font-size: 32px; font-weight: bold; color: #ffffff; margin-bottom: 20px;")
-        left_layout.addWidget(title_label)
-
-        # Texte
-        texts = [
-            self.translator.get_text(self.language, "start", "subtitle"),
-            self.translator.get_text(self.language, "start", "instruction1"),
-            self.translator.get_text(self.language, "start", "instruction2"),
-            self.translator.get_text(self.language, "start", "instruction3"),
-            self.translator.get_text(self.language, "start", "instruction4")
-        ]
-        
-        for text in texts:
-            label = QLabel(text)
-            label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-            label.setWordWrap(True)
-            label.setStyleSheet("color: #bdc3c7; font-size: 16px; padding: 12px 0; line-height: 1.5;")
-            left_layout.addWidget(label)
-
-        # Buttons
-        button_layout = QHBoxLayout()
-        scan_btn = QPushButton(self.translator.get_text(self.language, "start", "scan_btn"))
-        save_btn = QPushButton(self.translator.get_text(self.language, "start", "save_btn"))
-        
-        for btn in [scan_btn, save_btn]:
-            btn.setStyleSheet("""
-                QPushButton {
-                    font-size: 16px;
-                    font-weight: 600;
-                    padding: 14px 30px;
-                    border: none;
-                    border-radius: 6px;
-                    background: #495057;
-                    color: #ffffff;
-                    min-width: 140px;
-                }
-                QPushButton:hover {
-                    background: #6c757d;
-                }
-                QPushButton:pressed {
-                    background: #343a40;
-                }
-            """)
-            btn.setFixedHeight(50)
-            button_layout.addWidget(btn)
-
-        scan_btn.clicked.connect(self.go_next)
-        left_layout.addLayout(button_layout)
-        left_layout.addStretch()
-
-        return left_column
-
-    def create_start_right_column(self):
-        right_column = QWidget()
-        right_column.setFixedWidth(300)
-        right_layout = QVBoxLayout(right_column)
-        right_layout.setSpacing(15)
-
-        # Status-Überschrift
-        status_title = QLabel(self.translator.get_text(self.language, "start", "status_title"))
-        status_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        status_title.setStyleSheet("font-size: 20px; font-weight: 600; color: #3498db; padding: 10px 0; border-bottom: 2px solid #34495e;")
-        right_layout.addWidget(status_title)
-
-        # Status-Items
-        status_items = [
-            ("✅", self.translator.get_text(self.language, "start", "camera_status"), self.translator.get_text(self.language, "start", "ready")),
-            ("⚡", self.translator.get_text(self.language, "start", "light_status"), self.translator.get_text(self.language, "start", "active")),
-            ("📏", self.translator.get_text(self.language, "start", "measure_status"), self.translator.get_text(self.language, "start", "calibrated")),
-            ("⚖️", self.translator.get_text(self.language, "start", "scale_status"), self.translator.get_text(self.language, "start", "connected")),
-            ("💾", self.translator.get_text(self.language, "start", "storage_status"), self.translator.get_text(self.language, "start", "available"))
-        ]
-
-        for icon, name, status in status_items:
-            status_widget = self.create_status_item(icon, name, status)
-            right_layout.addWidget(status_widget)
-
-        refresh_btn = QPushButton("⟳ " + self.translator.get_text(self.language, "start", "refresh_btn"))
-        refresh_btn.setStyleSheet("""
-            QPushButton {
-                font-size: 12px; 
-                padding: 8px; 
-                background: #34495e; 
-                color: #7f8c8d; 
-                border: 1px solid #2c3e50; 
-                border-radius: 4px;
-            }
-            QPushButton:hover {
-                background: #3d566e;
-            }
-        """)
-        refresh_btn.setFixedHeight(35)
-        right_layout.addWidget(refresh_btn)
-        right_layout.addStretch()
-
-        return right_column
-
-    def create_status_item(self, icon, name, status):
-        status_widget = QWidget()
-        status_layout = QHBoxLayout(status_widget)
-        status_layout.setContentsMargins(10, 5, 10, 5)
-        
-        icon_label = QLabel(icon)
-        icon_label.setStyleSheet("font-size: 18px;")
-        
-        name_label = QLabel(name)
-        name_label.setStyleSheet("color: #ecf0f1; font-size: 14px; font-weight: 500;")
-        
-        status_label = QLabel(status)
-        status_label.setStyleSheet("color: #2ecc71; font-size: 13px; font-weight: 400;")
-        
-        status_layout.addWidget(icon_label)
-        status_layout.addWidget(name_label)
-        status_layout.addStretch()
-        status_layout.addWidget(status_label)
-        
-        return status_widget
 
     def make_card(self, text):
         label = QLabel(text)
@@ -593,7 +770,7 @@ class FullscreenApp(QMainWindow):
                 padding: 18px 30px;
                 margin: 10px 0;
                 background: transparent;
-                border-bottom: 1px solid #34495e;
+                border-bottom: 1px solid #323f4d;
                 line-height: 1.5;
             }
         """)
@@ -612,13 +789,13 @@ class FullscreenApp(QMainWindow):
                 padding: 12px;
             } QLabel {
                 font-size: 18px;
-                color: #2c3e50;
+                color: #333333;
             } QLineEdit {
                 font-size: 20px;
-                color: #2c3e50;
+                color: #333333;
                 background: transparent;
                 border: none;
-                border-bottom: 2px solid #2c3e50;
+                border-bottom: 2px solid #333333;
             }""")
 
         layout = QVBoxLayout(frame)
@@ -736,6 +913,7 @@ class FullscreenApp(QMainWindow):
 
     def add_page(self, title, labels):
         page = QWidget()
+        page.setStyleSheet("background-color: #333333;")
         page_layout = QVBoxLayout(page)
         page_layout.setSpacing(16)
 
@@ -748,7 +926,7 @@ class FullscreenApp(QMainWindow):
         # Linke Seite: Seitentitel
         title_label = QLabel(title)
         title_label.setAlignment(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft)
-        title_label.setStyleSheet("font-size: 32px; font-weight: bold; color: #2c3ea0;")
+        title_label.setStyleSheet("font-size: 32px; font-weight: bold; color: #3498db;")
         title_layout.addWidget(title_label, stretch=1)
 
         btn_de = self.create_flag_button("de.png", "de")
@@ -990,8 +1168,9 @@ class FullscreenApp(QMainWindow):
 
         if current_index == 0:
             self.back_btn.hide()
-            self.next_btn.hide()
+            self.next_btn.show()
         elif current_index == total_pages - 1:
+            self.back_btn.show()
             self.next_btn.hide()
         else:
             self.back_btn.show()
@@ -1047,11 +1226,11 @@ class FullscreenApp(QMainWindow):
             error = data.get("error", None)
 
             if found:
-                print(f"✅ Barcode erkannt in Bild {idx}: Wert='{value}', Typ='{b_type}'")
+                print(f"Barcode erkannt in Bild {idx}: Wert='{value}', Typ='{b_type}'")
             elif error:
-                print(f"❌ Barcode Fehler in Bild {idx}: {error}")
+                print(f"Barcode Fehler in Bild {idx}: {error}")
             else:
-                print(f"❌ Kein Barcode in Bild {idx}")
+                print(f"Kein Barcode in Bild {idx}")
 
             self.barcode_type = b_type if found else "Undefiniert"
             self.barcode = value if found else "Undefiniert"
