@@ -23,131 +23,68 @@ from PyQt6.QtCore import Qt, QSize, QThread, pyqtSignal
 
 class TranslationManager:
     def __init__(self):
+        #Struktur: (Deutsch, Englisch, Italienisch)
         self.translations = {
-            "de": {
-                "start": {
-                    "title": "3D-Scanner Interface",
-                    "subtitle": "Interface um den 3D-Scanner zu bedienen",
-                    "instruction1": "Bitte lege den Artikel der gescannt werden soll in die Box ein",
-                    "instruction2": "Stellen Sie sicher, dass der Artikel vollständig im Sichtfeld aller Kameras liegt",
-                    "instruction3": "Maximale Größe: 50x50x50 cm",
-                    "instruction4": "Maximales Gewicht: 20 kg",
-                    "scan_btn": "Scan Starten",
-                    "save_btn": "Lokal speichern",
-                    "status_title": "System Status",
-                    "camera_status": "Kamera System",
-                    "light_status": "Beleuchtung", 
-                    "measure_status": "Mess-System",
-                    "scale_status": "Waage",
-                    "storage_status": "Speicher",
-                    "ready": "Bereit",
-                    "active": "Aktiv",
-                    "calibrated": "Kalibriert",
-                    "connected": "Verbunden",
-                    "available": "Verfügbar",
-                    "refresh_btn": "Status aktualisieren"
-                },"photo": {
-                    "title": "Foto-Auswahl",
-                    "retry_btn": "Wiederholen",
-                    "discard_btn": "Verwerfen"
-                },"overview": {
-                    "title": "Kamera-Übersicht",
-                    "dimensions": "Abmessungen:",
-                    "weight": "Gewicht:",
-                    "mm": "mm",
-                    "kg": "kg"
-                },
-                "storage": {
-                    "title": "Speicher Option",
-                    "barcode_label": "Ausgewerteter Barcode:",
-                    "barcode_type": "Barcode-Typ:",
-                    "sap_btn": "SAP-Eintrag",
-                    "save_btn": "Lokal speichern"
-                }
-            },"en": {
-                "start": {
-                    "title": "3D Scanner Interface",
-                    "subtitle": "Interface to operate the 3D scanner",
-                    "instruction1": "Please place the item to be scanned in the box",
-                    "instruction2": "Make sure the item is completely in the field of view of all cameras", 
-                    "instruction3": "Maximum size: 50x50x50 cm",
-                    "instruction4": "Maximum weight: 20 kg",
-                    "scan_btn": "Start Scan",
-                    "save_btn": "Save Locally",
-                    "status_title": "System Status",
-                    "camera_status": "Camera System",
-                    "light_status": "Lighting",
-                    "measure_status": "Measurement System",
-                    "scale_status": "Scale", 
-                    "storage_status": "Storage",
-                    "ready": "Ready",
-                    "active": "Active",
-                    "calibrated": "Calibrated",
-                    "connected": "Connected",
-                    "available": "Available",
-                    "refresh_btn": "Refresh Status"
-                },"photo": {
-                    "title": "Photo Selection",
-                    "retry_btn": "Retake",
-                    "discard_btn": "Discard"
-                },"overview": {
-                    "title": "Camera Overview", 
-                    "dimensions": "Dimensions:",
-                    "weight": "Weight:",
-                    "mm": "mm",
-                    "kg": "kg"
-                },
-                "storage": {
-                    "title": "Storage Options",
-                    "barcode_label": "Barcode:",
-                    "barcode_type": "Barcode Type:",
-                    "sap_btn": "SAP Entry",
-                    "save_btn": "Save Locally"
-                }
-            },"it": {
-                "start": {
-                    "title": "Interfaccia Scanner 3D",
-                    "subtitle": "Interfaccia per gestire lo scanner 3D",
-                    "instruction1": "Si prega di posizionare l'articolo nella scatola",
-                    "instruction2": "Assicurarsi che l'articolo sia completamente nel campo visivo di tutte le telecamere",
-                    "instruction3": "Dimensione massima: 50x50x50 cm",
-                    "instruction4": "Peso massimo: 20 kg",
-                    "scan_btn": "Avvia Scan", 
-                    "save_btn": "Salva localmente",
-                    "status_title": "Stato del Sistema",
-                    "camera_status": "Sistema Fotocamera",
-                    "light_status": "Illuminazione",
-                    "measure_status": "Sistema di Misura",
-                    "scale_status": "Bilancia",
-                    "storage_status": "Memoria",
-                    "ready": "Pronto",
-                    "active": "Attivo", 
-                    "calibrated": "Calibrato",
-                    "connected": "Connesso",
-                    "available": "Disponibile",
-                    "refresh_btn": "Aggiorna Stato"
-                },"photo": {
-                    "title": "Selezione Foto",
-                    "retry_btn": "Ripeti",
-                    "discard_btn": "Scarta"
-                },"overview": {
-                    "title": "Panoramica Fotocamera",
-                    "dimensions": "Dimensioni:",
-                    "weight": "Peso:",
-                    "mm": "mm", 
-                    "kg": "kg"
-                },"storage": {
-                    "title": "Opzioni di Memorizzazione",
-                    "barcode_label": "Barcode:",
-                    "barcode_type": "Tipo di barcode:",
-                    "sap_btn": "SAP Entry",
-                    "save_btn": "Salva localmente"
-                }
+            "start": {
+                "title": ("3D-Scanner Interface", "3D Scanner Interface", "Interfaccia Scanner 3D"),
+                "subtitle": ("Interface um den 3D-Scanner zu bedienen", "Interface to operate the 3D scanner", "Interfaccia per gestire lo scanner 3D"),
+                "instruction1": ("Bitte lege den Artikel der gescannt werden soll in die Box ein", "Please place the item to be scanned in the box", "Si prega di posizionare l'articolo nella scatola"),
+                "instruction2": ("Stellen Sie sicher, dass der Artikel vollständig im Sichtfeld aller Kameras liegt", "Make sure the item is completely in the field of view of all cameras", "Assicurarsi che l'articolo sia completamente nel campo visivo di tutte le telecamere"),
+                "instruction3": ("Maximale Größe: 50x50x50 cm", "Maximum size: 50x50x50 cm", "Dimensione massima: 50x50x50 cm"),
+                "instruction4": ("Maximales Gewicht: 20 kg", "Maximum weight: 20 kg", "Peso massimo: 20 kg"),
+                "scan_btn": ("Scan Starten", "Start Scan", "Avvia Scan"),
+                "save_btn": ("Lokal speichern", "Save Locally", "Salva localmente"),
+                "status_title": ("System Status", "System Status", "Stato del Sistema"),
+                "camera_status": ("Kamera System", "Camera System", "Sistema Fotocamera"),
+                "light_status": ("Beleuchtung", "Lighting", "Illuminazione"),
+                "measure_status": ("Mess-System", "Measurement System", "Sistema di Misura"),
+                "scale_status": ("Waage", "Scale", "Bilancia"),
+                "storage_status": ("Speicher", "Storage", "Memoria"),
+                "ready": ("Bereit", "Ready", "Pronto"),
+                "active": ("Aktiv", "Active", "Attivo"),
+                "calibrated": ("Kalibriert", "Calibrated", "Calibrato"),
+                "connected": ("Verbunden", "Connected", "Connesso"),
+                "available": ("Verfügbar", "Available", "Disponibile"),
+                "refresh_btn": ("Status aktualisieren", "Refresh Status", "Aggiorna Stato"),
+                "check_camera": ("Kamera prüfen", "Check Camera", "Controlla Fotocamera"),
+                "check_light": ("Beleuchtung prüfen", "Check Lighting", "Controlla Illuminazione"),
+                "check_measure": ("Mess-System prüfen", "Check Measurement", "Controlla Sistema Misura"),
+                "calibrate_scale": ("Waage kalibrieren", "Calibrate Scale", "Calibra Bilancia"),
+                "check_storage": ("Speicher prüfen", "Check Storage", "Controlla Memoria")
+            },
+            "photo": {
+                "title": ("Foto-Auswahl", "Photo Selection", "Selezione Foto"),
+                "retry_btn": ("Wiederholen", "Retake", "Ripeti"),
+                "discard_btn": ("Verwerfen", "Discard", "Scarta")
+            },
+            "overview": {
+                "title": ("Kamera-Übersicht", "Camera Overview", "Panoramica Fotocamera"),
+                "dimensions": ("Abmessungen:", "Dimensions:", "Dimensioni:"),
+                "weight": ("Gewicht:", "Weight:", "Peso:"),
+                "mm": ("mm", "mm", "mm"),
+                "kg": ("kg", "kg", "kg")
+            },
+            "storage": {
+                "title": ("Speicher Option", "Storage Options", "Opzioni di Memorizzazione"),
+                "barcode_label": ("Ausgewerteter Barcode:", "Barcode:", "Barcode:"),
+                "barcode_type": ("Barcode-Typ:", "Barcode Type:", "Tipo di barcode:"),
+                "sap_btn": ("SAP-Eintrag", "SAP Entry", "SAP Entry"),
+                "save_btn": ("Lokal speichern", "Save Locally", "Salva localmente")
             }
         }
+        
+        # Sprach-Mapping: 0=Deutsch, 1=Englisch, 2=Italienisch
+        self.language_map = {"de": 0, "en": 1, "it": 2}
     
     def get_text(self, language, page, key):
-        return self.translations.get(language, {}).get(page, {}).get(key, f"[{key}]")
+        lang_index = self.language_map.get(language, 0)  # Default zu Deutsch
+        page_dict = self.translations.get(page, {})
+        text_tuple = page_dict.get(key, ("[FEHLER]", "[ERROR]", "[ERRORE]"))
+        
+        # Sicherstellen, dass wir immer einen String zurückgeben
+        if isinstance(text_tuple, tuple) and len(text_tuple) > lang_index:
+            return text_tuple[lang_index]
+        return f"[{key}]"
 
 class CameraManager:
     def __init__(self, debug_single_camera=False):
@@ -1142,16 +1079,13 @@ class FullscreenApp(QMainWindow):
                         "Scan abgeschlossen",
                         "Der Scan war erfolgreich!\nDie Daten stehen nun zur Verfügung."
                     )
-
             self.worker.finished.connect(finish_loading)
-
             def cancel_loading():
-                # WICHTIG: Trenne alle Verbindungen zuerst
                 try:
                     self.worker.output_received.disconnect()
                     self.worker.finished.disconnect()
                 except:
-                    pass  # Falls nicht verbunden, ignoriere Fehler
+                    pass 
                 
                 if self.worker.isRunning():
                     self.worker.terminate()
@@ -1179,13 +1113,13 @@ class FullscreenApp(QMainWindow):
 
         if current_index == 0:
             self.back_btn.hide()
-            self.next_btn.hide()  # Korrektur: Beide Buttons auf Startseite verstecken
+            self.next_btn.hide()
         elif current_index == total_pages - 1:
             self.back_btn.show()
-            self.next_btn.hide()  # Verstecke Next-Button auf der letzten Seite
+            self.next_btn.hide()
         else:
             self.back_btn.show()
-            self.next_btn.show()  # Zeige beide Buttons auf allen anderen Seiten
+            self.next_btn.show()
     
     def start_worker(self):
         self.worker = ParallelWorker(self.images)
@@ -1269,14 +1203,15 @@ class FullscreenApp(QMainWindow):
             self.load_pages()
             self.stack.setCurrentIndex(2)
             self.update_buttons()
-            # Füge diese Zeile hinzu
             QApplication.processEvents()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Left:
             self.go_back()
         elif event.key() == Qt.Key.Key_Right:
-            self.go_next()        
+            self.go_next()       
+
+ 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     w = FullscreenApp()
