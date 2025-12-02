@@ -1114,3 +1114,36 @@
 2025-12-02 15:58:16,239 - __main__ - INFO - go_back: Aktuelle Seite 1, scan_start=True
 2025-12-02 15:58:20,816 - __main__ - INFO - Sprache geändert zu: de
 2025-12-02 15:58:23,381 - __main__ - INFO - Speicher-Prüfung gestartet
+2025-12-02 16:04:33,746 - __main__ - INFO - 3D-Scanner wird gestartet...
+2025-12-02 16:04:35,658 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
+2025-12-02 16:04:36,634 - __main__ - INFO - go_next: Aktuelle Seite 0, scan_start=False
+2025-12-02 16:04:36,634 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
+2025-12-02 16:04:38,520 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2025-12-02 16:04:40,104 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2025-12-02 16:04:41,107 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2025-12-02 16:04:42,565 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2025-12-02 16:04:44,342 - __main__ - INFO - go_next: Aktuelle Seite 1, scan_start=True
+2025-12-02 16:04:44,380 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'int'>
+2025-12-02 16:04:44,382 - __main__ - INFO - Gewicht: 5
+2025-12-02 16:04:48,721 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
+2025-12-02 16:04:48,965 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
+2025-12-02 16:04:48,971 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
+2025-12-02 16:04:50,400 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
+2025-12-02 16:04:50,400 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
+2025-12-02 16:04:50,401 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
+2025-12-02 16:04:50,401 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
+2025-12-02 16:04:51,986 - __main__ - INFO - Bild 0: YOLO erkannt - 411 x 343
+2025-12-02 16:04:51,987 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
+2025-12-02 16:04:54,391 - __main__ - INFO - Bild 1: YOLO erkannt - 416 x 320
+2025-12-02 16:04:54,392 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
+2025-12-02 16:04:56,746 - __main__ - INFO - Bild 2: YOLO erkannt - 405 x 320
+2025-12-02 16:04:56,747 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
+2025-12-02 16:04:59,022 - __main__ - INFO - Bild 3: YOLO erkannt - 416 x 320
+2025-12-02 16:04:59,023 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['411 x 343', '416 x 320', '405 x 320', '416 x 320']
+2025-12-02 16:04:59,024 - __main__ - INFO - Ergebnis von Abmessung erhalten: Typ=<class 'list'>
+2025-12-02 16:04:59,024 - __main__ - INFO - Abmessungen erhalten: ['411 x 343', '416 x 320', '405 x 320', '416 x 320']
+2025-12-02 16:04:59,025 - __main__ - INFO - Gesamt-Abmessung berechnet: 411 x 411 x 343
+2025-12-02 16:04:59,025 - __main__ - INFO - Ergebnis von yolo_frames erhalten: Typ=<class 'list'>
+2025-12-02 16:04:59,026 - __main__ - INFO - Erhalte 4 annotierte Frames
+2025-12-02 16:04:59,026 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
+2025-12-02 16:04:59,108 - __main__ - INFO - Alle Tasks fertig
