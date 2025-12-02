@@ -1301,14 +1301,11 @@ class FullscreenApp(QMainWindow):
             if self.scan_start:
                 self.show_loading_dialog()
             else:
-                # Falls keine Bilder aufgenommen wurden
                 QMessageBox.warning(
                     self,
                     "Keine Bilder",
                     "Bitte nehmen Sie zuerst Bilder auf, bevor Sie fortfahren."
                 )
-        
-        # Von Kamera-Übersicht (Index 2) zu Storage (Index 3)
         elif idx == 2:
             self.stack.setCurrentIndex(idx + 1)
             self.update_buttons()
@@ -1448,7 +1445,7 @@ class FullscreenApp(QMainWindow):
         self.worker.output_received.connect(self.handle_output)
         self.worker.progress_updated.connect(self.update_progress_bar)
         self.worker.finished.connect(lambda: logger.info("Alle Tasks fertig"))
-        self.worker.start()  # Wichtig: start() nicht start_processing()
+        self.worker.start()
 
     def update_progress_bar(self, value: int):
         """Aktualisiert den Fortschrittsbalken"""
@@ -1501,22 +1498,15 @@ class FullscreenApp(QMainWindow):
                 self.annotierte_frames = data
                 logger.info(f"Erhalte {len(data)} annotierte Frames")
                 
-                # WICHTIG: Aktualisiere final_images SOFORT
                 for i in range(min(len(data), CONFIG.NUM_CAMERAS)):
                     if data[i] is not None and self.keep[i]:
-                        # Konvertiere RGB zu BGR für korrekte Anzeige
-                        if len(data[i].shape) == 3 and data[i].shape[2] == 3:
-                            # Prüfe ob es bereits BGR ist (OpenCV Standard)
-                            # Normalerweise ist YOLO-Ausgabe RGB, konvertiere zu BGR
-                            try:
-                                self.final_images[i] = cv2.cvtColor(data[i], cv2.COLOR_RGB2BGR)
-                                logger.debug(f"Bild {i}: Konvertiert von RGB zu BGR")
-                            except:
-                                self.final_images[i] = data[i]
-                        else:
-                            self.final_images[i] = data[i]
+                        # BEHALTE RGB
+                        self.final_images[i] = data[i]
+                        logger.debug(f"Final image {i} gesetzt (Größe: {self.final_images[i].shape}, Typ: {self.final_images[i].dtype})")
                         
-                        logger.debug(f"Final image {i} gesetzt (Größe: {self.final_images[i].shape})")
+                        # Debug: Prüfe den Farbraum
+                        if len(self.final_images[i].shape) == 3:
+                            logger.debug(f"  Kanalreihenfolge: {self.final_images[i].shape[2]} Kanäle")
                     else:
                         self.final_images[i] = None
                         logger.debug(f"Final image {i} ist None (keep={self.keep[i]})")
@@ -1539,8 +1529,7 @@ class FullscreenApp(QMainWindow):
         elif script_name == "weight":
             self.gewicht = data
             logger.info(f"Gewicht: {data}")
-        
-        # Nach jedem Update prüfen, ob wir die GUI aktualisieren können
+
         self._check_and_update_gui()
 
     def _check_and_update_gui(self):
