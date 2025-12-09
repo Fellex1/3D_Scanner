@@ -8,20 +8,21 @@ Lokal speichern Integration     (Platzhalter-Button)
 GUI-Design verbessern           (optional)
 ================================"""
 
+import os
 import sys
 import cv2
-import os
-import numpy as np
+import json
 import logging
 import platform
-from typing import List, Tuple, Dict, Optional, Any
+import numpy as np
+from datetime import datetime 
 from dataclasses import dataclass
-import json
+from typing import List, Tuple, Dict, Optional, Any
 
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
     QPushButton, QLabel, QFrame, QSizePolicy, QStackedWidget, QScrollArea, 
-    QToolButton, QMessageBox, QDialog, QProgressBar
+    QToolButton, QMessageBox, QDialog, QProgressBar, QComboBox
 )
 from PyQt6.QtGui import QPixmap, QIcon, QKeySequence, QShortcut, QMovie, QImage
 from PyQt6.QtCore import Qt, QSize, QThread, pyqtSignal
@@ -119,7 +120,11 @@ class TranslationManager:
                 "title": ("Speicher Option", "Storage Options", "Opzioni di Memorizzazione"),
                 "no_barcodes": ("Keine Barcodes erkannt", "No barcodes detected", "Nessun codice a barre rilevato"),
                 "sap_btn": ("SAP-Eintrag", "SAP Entry", "SAP Entry"),
-                "save_btn": ("Lokal speichern", "Save Locally", "Salva localmente")
+                "save_btn": ("Lokal speichern", "Save Locally", "Salva localmente"),
+                "barcode_label": ("Barcode:", "Barcode:", "Codice a barre:"),
+                "type_label": ("Typ:", "Type:", "Tipo:"),
+                "source_label": ("Quelle:", "Source:", "Fonte:"),
+                "manual_entry": ("Manuelle Eingabe", "Manual Entry", "Ingresso Manuale")
             }
         }
         
@@ -1266,27 +1271,45 @@ class FullscreenApp(QMainWindow):
         """Erzeugt den dynamischen Inhalt für die Storage Pages basierend auf erkannten Barcodes"""
         content = []
         
+        # Übersetzungen laden
+        no_barcodes_text = self.translator.get_text(self.language, "storage", "no_barcodes")
+        
         # Füge Barcode-Einträge hinzu
         if hasattr(self, 'all_barcodes') and self.all_barcodes:
+            self.barcode_input_widgets = []  # Liste für Widget-Referenzen
             for i, barcode in enumerate(self.all_barcodes):
-                # Barcode-Karte im gleichen Stil wie die anderen Widgets
-                barcode_card = ("custom", self.create_barcode_widget(barcode, i))
+                # Bearbeitbares Barcode-Widget erstellen
+                barcode_card = ("custom", self.create_editable_barcode_widget(barcode, i))
                 content.append([barcode_card])
+                # Widget-Referenz speichern
+                if hasattr(self, 'stack') and self.stack.count() > 3:
+                    page = self.stack.widget(3)
+                    scroll = page.findChild(QScrollArea)
+                    if scroll:
+                        content_widget = scroll.widget()
+                        # Letztes hinzugefügtes Widget finden
+                        last_layout_item = content_widget.layout().itemAt(content_widget.layout().count() - 1)
+                        if last_layout_item and last_layout_item.widget():
+                            frame = last_layout_item.widget()
+                            self.barcode_input_widgets.append(frame)
         else:
-            # Keine Barcodes gefunden - übersetzt
-            no_barcodes_text = self.translator.get_text(self.language, "storage", "no_barcodes")
+            # Keine Barcodes gefunden - leeres Formular für manuelle Eingabe
+            empty_barcode = {"value": "", "type": "EAN13", "image_index": -1, "cropped_image": None}
+            barcode_card = ("custom", self.create_editable_barcode_widget(empty_barcode, 0))
             content.append([("text", no_barcodes_text)])
+            content.append([barcode_card])
         
         # Buttons am Ende (SAP-Eintrag, Lokal speichern) - übersetzt
         content.append([
             ("button", self.translator.get_text(self.language, "storage", "sap_btn"), self.sap_integration_placeholder),
-            ("button", self.translator.get_text(self.language, "storage", "save_btn"), self.local_save_placeholder)
+            ("button", self.translator.get_text(self.language, "storage", "save_btn"), self.save_barcodes_locally)
         ])
         
         return content
 
-    def create_barcode_widget(self, barcode: Dict, index: int) -> QFrame:
-        """Erstellt ein Barcode-Widget im Stil der anderen Seiten (ohne Kopier-Button)"""
+
+    def create_editable_barcode_widget(self, barcode: Dict, index: int) -> QFrame:
+        """Erstellt ein bearbeitbares Barcode-Widget mit Eingabefeldern"""
         frame = QFrame()
         frame.setStyleSheet("""
             QFrame {
@@ -1294,6 +1317,20 @@ class FullscreenApp(QMainWindow):
                 border: 1px solid #5d6d7e;
                 border-radius: 12px;
                 padding: 20px;
+            }
+            QLabel {
+                color: #ECF0F1;
+            }
+            QLineEdit, QComboBox {
+                background: #2C3E50;
+                border: 1px solid #5d6d7e;
+                border-radius: 6px;
+                padding: 8px;
+                color: #ECF0F1;
+                font-size: 14px;
+            }
+            QLineEdit:focus, QComboBox:focus {
+                border: 1px solid #3498db;
             }
         """)
         
@@ -1304,6 +1341,11 @@ class FullscreenApp(QMainWindow):
         image_container = QWidget()
         image_layout = QVBoxLayout(image_container)
         image_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        # Übersetzte Text für die GUI
+        barcode_label_text = self.translator.get_text(self.language, "storage", "barcode_label")
+        type_label_text = self.translator.get_text(self.language, "storage", "type_label")
+        source_label_text = self.translator.get_text(self.language, "storage", "source_label")
         
         if "cropped_image" in barcode and barcode["cropped_image"] is not None:
             cropped_img = barcode["cropped_image"]
@@ -1330,14 +1372,9 @@ class FullscreenApp(QMainWindow):
             image_layout.addWidget(image_label)
             
             # Bildquelle
-            image_names = [
-                self.translator.get_text(self.language, "photo", "iso_image"),  # Falls vorhanden
-                self.translator.get_text(self.language, "photo", "top_image"),   # Falls vorhanden
-                self.translator.get_text(self.language, "photo", "right_image"), # Falls vorhanden
-                self.translator.get_text(self.language, "photo", "behind_image") # Falls vorhanden
-            ]
+            image_names = ["ISO Bild", "Top Bild", "Right Bild", "Behind Bild"]
             img_idx = barcode.get('image_index', 0)
-            source_text = f"Quelle: {image_names[img_idx] if img_idx < len(image_names) else f'Bild {img_idx}'}"
+            source_text = f"{source_label_text} {image_names[img_idx] if img_idx < len(image_names) else f'Bild {img_idx}'}"
             source_label = QLabel(source_text)
             source_label.setStyleSheet("font-size: 12px; color: #BDC3C7; margin-top: 8px;")
             source_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1352,31 +1389,128 @@ class FullscreenApp(QMainWindow):
             placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
             placeholder.setFixedSize(250, 150)
             image_layout.addWidget(placeholder)
+            
+            # Quelle für manuelle Eingabe
+            source_label = QLabel(f"{source_label_text} Manuelle Eingabe")
+            source_label.setStyleSheet("font-size: 12px; color: #BDC3C7; margin-top: 8px;")
+            source_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            image_layout.addWidget(source_label)
         
         layout.addWidget(image_container)
         
-        # Rechte Seite: Barcode-Informationen
+        # Rechte Seite: Bearbeitbare Barcode-Informationen
         info_container = QWidget()
         info_layout = QVBoxLayout(info_container)
         info_layout.setSpacing(15)
         
-        # Barcode-Wert
-        value_text = f"<b>Barcode:</b> {barcode.get('value', 'N/A')}"
-        value_label = QLabel(value_text)
-        value_label.setStyleSheet("font-size: 18px; color: #ECF0F1;")
-        value_label.setWordWrap(True)
-        info_layout.addWidget(value_label)
+        # Barcode-Wert Eingabefeld
+        barcode_value_label = QLabel(barcode_label_text)
+        barcode_value_label.setStyleSheet("font-size: 16px; font-weight: bold;")
+        info_layout.addWidget(barcode_value_label)
         
-        # Barcode-Typ
-        type_text = f"<b>Typ:</b> {barcode.get('type', 'N/A')}"
-        type_label = QLabel(type_text)
-        type_label.setStyleSheet("font-size: 16px; color: #BDC3C7;")
+        barcode_input = QLineEdit()
+        barcode_input.setText(barcode.get('value', ''))
+        barcode_input.setPlaceholderText("Barcode hier eingeben...")
+        barcode_input.textChanged.connect(lambda text: self.update_barcode_value(index, text))
+        info_layout.addWidget(barcode_input)
+        
+        # Barcode-Typ Auswahl
+        type_label = QLabel(type_label_text)
+        type_label.setStyleSheet("font-size: 16px; font-weight: bold; margin-top: 10px;")
         info_layout.addWidget(type_label)
+        
+        type_combo = QComboBox()
+        barcode_types = ["EAN13", "EAN8", "UPC-A", "UPC-E", "CODE128", "CODE39", "ITF", "QR"]
+        type_combo.addItems(barcode_types)
+        
+        # Aktuellen Typ setzen, falls vorhanden
+        current_type = barcode.get('type', 'EAN13')
+        if current_type in barcode_types:
+            type_combo.setCurrentText(current_type)
+        type_combo.currentTextChanged.connect(lambda text: self.update_barcode_type(index, text))
+        info_layout.addWidget(type_combo)
+        
+        # Status-Anzeige (erkannt/nicht erkannt)
+        status_label = QLabel()
+        if barcode.get('value'):
+            status_label.setText("Barcode erkannt")
+            status_label.setStyleSheet("color: #2ecc71; font-weight: bold; margin-top: 10px;")
+        else:
+            status_label.setText("Kein Barcode erkannt - Bitte manuell eingeben")
+            status_label.setStyleSheet("color: #e74c3c; font-weight: bold; margin-top: 10px;")
+        info_layout.addWidget(status_label)
         
         info_layout.addStretch()
         layout.addWidget(info_container, stretch=1)
         
+        # Referenzen für späteren Zugriff speichern
+        frame.barcode_input = barcode_input
+        frame.type_combo = type_combo
+        frame.status_label = status_label
+        
         return frame
+
+    def update_barcode_value(self, index: int, value: str):
+        """Aktualisiert den Barcode-Wert"""
+        if index < len(self.all_barcodes):
+            self.all_barcodes[index]['value'] = value
+            
+            # Status aktualisieren
+            if hasattr(self, 'barcode_input_widgets') and index < len(self.barcode_input_widgets):
+                frame = self.barcode_input_widgets[index]
+                if value.strip():
+                    frame.status_label.setText("Barcode erkannt/bearbeitet")
+                    frame.status_label.setStyleSheet("color: #2ecc71; font-weight: bold; margin-top: 10px;")
+                else:
+                    frame.status_label.setText("Kein Barcode erkannt - Bitte manuell eingeben")
+                    frame.status_label.setStyleSheet("color: #e74c3c; font-weight: bold; margin-top: 10px;")
+
+    def update_barcode_type(self, index: int, barcode_type: str):
+        """Aktualisiert den Barcode-Typ"""
+        if index < len(self.all_barcodes):
+            self.all_barcodes[index]['type'] = barcode_type
+
+    def save_barcodes_locally(self):
+        """Speichert die bearbeiteten Barcode-Daten lokal"""
+        barcode_data = []
+        
+        # Sammle alle Barcode-Daten
+        if hasattr(self, 'all_barcodes'):
+            for barcode in self.all_barcodes:
+                if barcode.get('value'):  # Nur speichern wenn ein Wert vorhanden ist
+                    barcode_data.append({
+                        'barcode': barcode.get('value', ''),
+                        'type': barcode.get('type', 'EAN13'),
+                        'source': barcode.get('image_index', 'Manuelle Eingabe'),
+                        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    })
+        
+        if barcode_data:
+            # In Datei speichern
+            try:
+                import json
+                with open('barcode_data.json', 'w', encoding='utf-8') as f:
+                    json.dump(barcode_data, f, indent=4, ensure_ascii=False)
+                
+                QMessageBox.information(
+                    self,
+                    "Erfolgreich gespeichert",
+                    f"{len(barcode_data)} Barcode(s) wurden lokal gespeichert."
+                )
+                logger.info(f"{len(barcode_data)} Barcode(s) lokal gespeichert")
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    "Fehler beim Speichern",
+                    f"Die Barcodes konnten nicht gespeichert werden: {str(e)}"
+                )
+                logger.error(f"Fehler beim Speichern der Barcodes: {e}")
+        else:
+            QMessageBox.warning(
+                self,
+                "Keine Barcodes",
+                "Es wurden keine Barcodes zum Speichern gefunden."
+            )
 
     def go_back(self):
         """Geht zur vorherigen Seite"""
