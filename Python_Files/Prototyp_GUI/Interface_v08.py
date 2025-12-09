@@ -1161,7 +1161,6 @@ class FullscreenApp(QMainWindow):
 
     def load_pages(self):
         """Lädt alle Seiten neu, behält aber die aktuelle Seite bei"""
-        # Speichere aktuelle Seite
         current_page = self.stack.currentIndex() if hasattr(self, 'stack') else 0
         
         if self.abmessung is None:
