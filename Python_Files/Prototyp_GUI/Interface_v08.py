@@ -1,3 +1,4 @@
+#Interface_v08.py
 """=======TODO-Liste v0.6=======
 Objekt-Detection muss verbessert werden
 Lade-Dialog schöner gestalten
@@ -117,8 +118,7 @@ class TranslationManager:
             },
             "storage": {
                 "title": ("Speicher Option", "Storage Options", "Opzioni di Memorizzazione"),
-                "barcode_label": ("Ausgewerteter Barcode:", "Barcode:", "Barcode:"),
-                "barcode_type": ("Barcode-Typ:", "Barcode Type:", "Tipo di barcode:"),
+                "no_barcodes": ("Keine Barcodes erkannt", "No barcodes detected", "Nessun codice a barre rilevato"),
                 "sap_btn": ("SAP-Eintrag", "SAP Entry", "SAP Entry"),
                 "save_btn": ("Lokal speichern", "Save Locally", "Salva localmente")
             }
@@ -246,13 +246,14 @@ class CameraManager:
 class DetectionManager:
     def __init__(self):
         self.yolo_model = None
-        self.barcode_model = None
+        self.barcode_detector = None  # Wird später initialisiert
+        self.all_barcodes: List[Dict[str, Any]] = []
         
     def load_yolo_model(self, model_path: str = CONFIG.YOLO_MODEL_PATH):
         """Lädt das YOLO-Modell (einmalig)"""
         try:
             from ultralytics import YOLO
-            self.barcode_model = YOLO(model_path)
+            self.yolo_model = YOLO(model_path)
             logger.info(f"YOLO-Modell geladen von {model_path}")
         except ImportError as e:
             logger.error(f"YOLO nicht verfügbar: {e}")
@@ -334,60 +335,60 @@ class DetectionManager:
         logger.info(f"YOLO-Erkennung abgeschlossen. Dimensionen: {all_dimensions}")
         return all_dimensions, all_frames
     
+
     def run_barcode_detection(self, images: List[np.ndarray]) -> List[Dict[str, Any]]:
-        """Erkennt Barcodes in den Bildern"""
-        results: List[Dict[str, Any]] = []
-        
+        """Erkennt alle Barcodes in den Bildern"""
         try:
-            from BarCode_v02 import process_roi
-        except ImportError as e:
-            logger.error(f"Barcode-Modul nicht gefunden: {e}")
-            for idx in range(len(images)):
-                results.append({"index": idx, "found": False, "error": "Modul nicht verfügbar"})
-            return results
-        
-        if self.barcode_model is None:
-            self.load_yolo_model()
-        
-        for idx, img in enumerate(images):
-            if img is None:
-                results.append({"index": idx, "found": False})
-                continue
-
-            try:
-                found = False
-                decoded_value = None
-                decoded_type = None
-
-                if self.barcode_model:
-                    model_results = self.barcode_model.predict(img)
-
-                    for r in model_results:
-                        for box in r.boxes.xyxy:
-                            x1, y1, x2, y2 = map(int, box)
-                            roi = img[y1:y2, x1:x2]
-                            result = process_roi(roi, f"image_{idx}")
-                            if result["found"]:
-                                found = True
-                                decoded_value = result["value"]
-                                decoded_type = result["type"]
-                                break
-
-                        if found:
-                            break
-
-                results.append({
-                    "index": idx,
-                    "found": found,
-                    "value": decoded_value,
-                    "type": decoded_type
-                })
+            # Importiere die BarcodeDetector Klasse
+            from BarCode_v02 import BarcodeDetector
+            
+            # Initialisiere Detector
+            detector = BarcodeDetector()
+            self.all_barcodes = []
+            
+            image_names = ["iso_Bild", "top_Bild", "right_Bild", "behind_Bild"]
+            
+            for idx, img in enumerate(images):
+                if img is None:
+                    logger.warning(f"Bild {idx} ist None - überspringe")
+                    continue
                 
-            except Exception as e:
-                logger.error(f"Fehler bei Barcode-Erkennung Bild {idx}: {e}")
-                results.append({"index": idx, "found": False, "error": str(e)})
-        
-        return results
+                img_name = image_names[idx] if idx < len(image_names) else f"Bild_{idx}"
+                logger.info(f"Analysiere Bild {idx} ({img_name}) auf Barcodes...")
+                
+                try:
+                    # Erkenne Barcodes in diesem Bild
+                    barcodes_in_image = detector.detect_barcodes_in_image(img, idx, img_name)
+                    
+                    if barcodes_in_image:
+                        logger.info(f"Bild {idx}: {len(barcodes_in_image)} Barcode(s) erkannt")
+                        self.all_barcodes.extend(barcodes_in_image)
+                    else:
+                        logger.info(f"Bild {idx}: Keine Barcodes erkannt")
+                        
+                except Exception as e:
+                    logger.error(f"Fehler bei Barcode-Erkennung Bild {idx}: {e}")
+            
+            logger.info(f"Insgesamt {len(self.all_barcodes)} Barcodes in {len(images)} Bildern erkannt")
+            
+            # Konvertiere zu einfachem Format für die GUI
+            simple_barcodes = []
+            for barcode in self.all_barcodes:
+                simple_barcodes.append({
+                    "found": True,
+                    "value": barcode.get("value"),
+                    "type": barcode.get("type"),
+                    "image_index": barcode.get("image_index", 0),
+                    "cropped_image": barcode.get("cropped_image")
+                })
+            
+            return simple_barcodes
+            
+        except Exception as e:
+            logger.error(f"Fehler in run_barcode_detection: {e}")
+            return []
+
+
 
 # ==================== Parallel Worker ====================
 class ParallelWorker(QThread):   
@@ -908,6 +909,132 @@ class FullscreenApp(QMainWindow):
             button.clicked.connect(callback)
         return button
 
+    def create_barcode_card(self, barcode: Dict) -> QFrame:
+        """Erstellt eine Barcode-Karte für die Anzeige"""
+        card = QFrame()
+        card.setStyleSheet("""
+            QFrame {
+                background: #34495E;
+                border: 1px solid #5d6d7e;
+                border-radius: 12px;
+                padding: 20px;
+            }
+            QFrame:hover {
+                border: 1px solid #3498DB;
+                background: #3D566E;
+            }
+        """)
+        
+        layout = QVBoxLayout(card)
+        layout.setSpacing(15)
+        
+        # Erste Zeile: Bild und Basis-Info
+        top_layout = QHBoxLayout()
+        
+        # Barcode-Bild (zugeschnitten)
+        if "cropped_image" in barcode and barcode["cropped_image"] is not None:
+            cropped_img = barcode["cropped_image"]
+            # Füge rote Umrandung hinzu (visuelle Hervorhebung)
+            if len(cropped_img.shape) == 3:
+                # RGB zu BGR für OpenCV
+                if cropped_img.shape[2] == 3:
+                    bordered_img = cv2.copyMakeBorder(cropped_img, 5, 5, 5, 5, 
+                                                    cv2.BORDER_CONSTANT, value=(0, 0, 255))
+                else:
+                    bordered_img = cropped_img
+            else:
+                # Graubild zu RGB konvertieren
+                bordered_img = cv2.cvtColor(cropped_img, cv2.COLOR_GRAY2RGB)
+                bordered_img = cv2.copyMakeBorder(bordered_img, 5, 5, 5, 5,
+                                                cv2.BORDER_CONSTANT, value=(255, 0, 0))
+            
+            # Skaliere für einheitliche Darstellung
+            pixmap = self.convert_to_pixmap(bordered_img, width=250, height=150)
+            image_label = QLabel()
+            image_label.setPixmap(pixmap)
+            image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            top_layout.addWidget(image_label)
+        else:
+            # Platzhalter-Bild
+            placeholder = QLabel("Kein Bild verfügbar")
+            placeholder.setStyleSheet("color: #BDC3C7; font-style: italic;")
+            placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            placeholder.setFixedSize(250, 150)
+            top_layout.addWidget(placeholder)
+        
+        # Barcode-Informationen
+        info_widget = QWidget()
+        info_layout = QVBoxLayout(info_widget)
+        info_layout.setSpacing(10)
+        
+        # Barcode Wert
+        value_label = QLabel(f"<b>Barcode:</b> {barcode.get('value', 'N/A')}")
+        value_label.setStyleSheet("font-size: 16px; color: #ECF0F1;")
+        value_label.setWordWrap(True)
+        info_layout.addWidget(value_label)
+        
+        # Barcode Typ
+        type_label = QLabel(f"<b>Typ:</b> {barcode.get('type', 'N/A')}")
+        type_label.setStyleSheet("font-size: 14px; color: #BDC3C7;")
+        info_layout.addWidget(type_label)
+        
+        # Herkunftsbild
+        image_names = ["ISO-Ansicht", "Draufsicht", "Rechte Seite", "Linke Seite"]
+        image_idx = barcode.get('image_index', 0)
+        source_label = QLabel(f"<b>Quelle:</b> {image_names[image_idx] if image_idx < len(image_names) else f'Bild {image_idx}'}")
+        source_label.setStyleSheet("font-size: 14px; color: #BDC3C7;")
+        info_layout.addWidget(source_label)
+        
+        top_layout.addWidget(info_widget)
+        top_layout.addStretch()
+        layout.addLayout(top_layout)
+        
+        # Trennlinie
+        separator = QFrame()
+        separator.setFrameShape(QFrame.Shape.HLine)
+        separator.setStyleSheet("background-color: #5d6d7e;")
+        layout.addWidget(separator)
+        
+        # Zusätzliche Aktionen
+        action_layout = QHBoxLayout()
+        
+        # Kopieren-Button
+        copy_btn = QPushButton("Barcode kopieren")
+        copy_btn.setStyleSheet("""
+            QPushButton {
+                background: #7F8C8D;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 15px;
+                font-size: 12px;
+            }
+            QPushButton:hover {
+                background: #95A5A6;
+            }
+        """)
+        copy_btn.clicked.connect(lambda: self.copy_to_clipboard(barcode.get('value', '')))
+        
+        action_layout.addWidget(copy_btn)
+        action_layout.addStretch()
+        
+        layout.addLayout(action_layout)
+        
+        return card
+
+
+    def sap_integration_placeholder(self):
+        """Platzhalter für SAP-Integration"""
+        QMessageBox.information(self, "SAP-Integration", 
+                            "SAP-Integration würde jetzt gestartet werden...")
+        logger.info("SAP-Integration Button gedrückt")
+
+    def local_save_placeholder(self):
+        """Platzhalter für lokales Speichern"""
+        QMessageBox.information(self, "Lokales Speichern", 
+                            "Daten würden jetzt lokal gespeichert werden...")
+        logger.info("Lokales Speichern Button gedrückt")
+        
     def convert_to_pixmap(self, frame: np.ndarray, width: int = 300, height: int = 300) -> QPixmap:
         """Konvertiert OpenCV-Bild zu QPixmap"""
         if frame is None or (isinstance(frame, np.ndarray) and np.all(frame == 0)):
@@ -1010,18 +1137,39 @@ class FullscreenApp(QMainWindow):
             return self.make_card(str(item))
         
         widget_type = item[0]
+        
+        if widget_type == "custom":
+            # Custom-Widget direkt zurückgeben
+            return item[1]
+        
         widget_creators = {
             "button": self._create_button_widget,
             "image": self._create_image_widget, 
             "ram_image": self._create_ram_image_widget,
             "ram_image_final": self._create_ram_image_final_widget,
             "title": self._create_title_widget,
-            "input": self._create_input_widget
+            "input": self._create_input_widget,
+            "text": self._create_text_widget
         }
         creator = widget_creators.get(widget_type)
         if creator:
             return creator(*item[1:])
         return self.make_card(str(item))
+
+    def _create_text_widget(self, text: str) -> QLabel:
+        """Erstellt einen Text-Widget"""
+        label = QLabel(text)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        label.setStyleSheet("""
+            QLabel {
+                color: #BDC3C7;
+                font-size: 18px;
+                font-style: italic;
+                padding: 30px;
+            }
+        """)
+        label.setWordWrap(True)
+        return label
 
     def _create_button_widget(self, text: str, callback=None) -> QPushButton:
         """Erstellt einen Button"""
@@ -1163,13 +1311,13 @@ class FullscreenApp(QMainWindow):
         """Lädt alle Seiten neu, behält aber die aktuelle Seite bei"""
         current_page = self.stack.currentIndex() if hasattr(self, 'stack') else 0
         
-        if self.abmessung is None:
+        # Setze Standardwerte wenn nicht vorhanden
+        if not hasattr(self, 'abmessung') or self.abmessung is None:
             self.abmessung = "Undefiniert"
-        if self.gewicht is None:
+        if not hasattr(self, 'gewicht') or self.gewicht is None:
             self.gewicht = "Undefiniert"
-        if self.barcode is None:
-            self.barcode = "Undefiniert"
-            self.barcode_type = "Undefiniert"
+        if not hasattr(self, 'all_barcodes'):
+            self.all_barcodes = []
         
         # Alte Seiten entfernen
         while self.stack.count() > 0:
@@ -1177,7 +1325,7 @@ class FullscreenApp(QMainWindow):
             self.stack.removeWidget(widget)
             widget.deleteLater()
 
-        # Startseite mit speziellem Layout
+        # Startseite
         start_page = self.create_start_page()
         self.stack.addWidget(start_page)
 
@@ -1209,17 +1357,11 @@ class FullscreenApp(QMainWindow):
             },
             "storage": {
                 "title_key": "storage",
-                "content": [
-                    ("image", "barcode"),
-                    ("input", self.translator.get_text(self.language, "storage", "barcode_label"), f"{self.barcode}"),
-                    ("input", self.translator.get_text(self.language, "storage", "barcode_type"), f"{self.barcode_type}"),
-                    [("button", self.translator.get_text(self.language, "storage", "sap_btn")),
-                    ("button", self.translator.get_text(self.language, "storage", "save_btn"))]
-                ]
+                "content": self.get_storage_page_content()
             }
         }
         
-        # Seiten hinzufügen
+        # Füge alle Seiten hinzu
         for page_key in ["photo", "overview", "storage"]:
             config = page_configs[page_key]
             self.add_page(
@@ -1227,14 +1369,124 @@ class FullscreenApp(QMainWindow):
                 config["content"]
             )
         
-        # Zurück zur ursprünglichen Seite springen (maximale Seitenzahl beachten)
+        # Zurück zur ursprünglichen Seite springen
         max_pages = self.stack.count()
         if current_page >= max_pages:
             current_page = max_pages - 1
         
         self.stack.setCurrentIndex(current_page)
         self.update_buttons()
+
+    def get_storage_page_content(self) -> List[Any]:
+        """Erzeugt den dynamischen Inhalt für die Storage Pages basierend auf erkannten Barcodes"""
+        content = []
         
+        # Füge Barcode-Einträge hinzu
+        if hasattr(self, 'all_barcodes') and self.all_barcodes:
+            for i, barcode in enumerate(self.all_barcodes):
+                # Barcode-Karte im gleichen Stil wie die anderen Widgets
+                barcode_card = ("custom", self.create_barcode_widget(barcode, i))
+                content.append([barcode_card])
+        else:
+            # Keine Barcodes gefunden
+            no_barcodes_text = "Keine Barcodes erkannt"
+            content.append([("text", no_barcodes_text)])
+        
+        # Buttons am Ende (SAP-Eintrag, Lokal speichern)
+        content.append([
+            ("button", "SAP-Eintrag", self.sap_integration_placeholder),
+            ("button", "Lokal speichern", self.local_save_placeholder)
+        ])
+        
+        return content
+
+    def create_barcode_widget(self, barcode: Dict, index: int) -> QFrame:
+        """Erstellt ein Barcode-Widget im Stil der anderen Seiten (ohne Kopier-Button)"""
+        frame = QFrame()
+        frame.setStyleSheet("""
+            QFrame {
+                background: #34495E;
+                border: 1px solid #5d6d7e;
+                border-radius: 12px;
+                padding: 20px;
+            }
+        """)
+        
+        layout = QHBoxLayout(frame)
+        layout.setSpacing(20)
+        
+        # Linke Seite: Barcode-Bild mit roter Umrandung
+        image_container = QWidget()
+        image_layout = QVBoxLayout(image_container)
+        image_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        if "cropped_image" in barcode and barcode["cropped_image"] is not None:
+            cropped_img = barcode["cropped_image"]
+            
+            # Erstelle Bild mit roter Umrandung
+            if len(cropped_img.shape) == 3:
+                if cropped_img.shape[2] == 3:
+                    # BGR zu RGB für rote Umrandung
+                    bordered_img = cv2.copyMakeBorder(cropped_img, 5, 5, 5, 5, 
+                                                    cv2.BORDER_CONSTANT, value=(0, 0, 255))
+                    bordered_img = cv2.cvtColor(bordered_img, cv2.COLOR_BGR2RGB)
+                else:
+                    bordered_img = cropped_img
+            else:
+                # Graubild zu RGB
+                bordered_img = cv2.cvtColor(cropped_img, cv2.COLOR_GRAY2RGB)
+                bordered_img = cv2.copyMakeBorder(bordered_img, 5, 5, 5, 5,
+                                                cv2.BORDER_CONSTANT, value=(255, 0, 0))
+            
+            pixmap = self.convert_to_pixmap(bordered_img, width=250, height=150)
+            image_label = QLabel()
+            image_label.setPixmap(pixmap)
+            image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            image_layout.addWidget(image_label)
+            
+            # Bildquelle
+            image_names = ["ISO-Ansicht", "Draufsicht", "Rechte Seite", "Linke Seite"]
+            img_idx = barcode.get('image_index', 0)
+            source_text = f"Quelle: {image_names[img_idx] if img_idx < len(image_names) else f'Bild {img_idx}'}"
+            source_label = QLabel(source_text)
+            source_label.setStyleSheet("font-size: 12px; color: #BDC3C7; margin-top: 8px;")
+            source_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            image_layout.addWidget(source_label)
+        else:
+            placeholder = QLabel("Kein Bild verfügbar")
+            placeholder.setStyleSheet("""
+                color: #BDC3C7;
+                font-style: italic;
+                font-size: 14px;
+            """)
+            placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            placeholder.setFixedSize(250, 150)
+            image_layout.addWidget(placeholder)
+        
+        layout.addWidget(image_container)
+        
+        # Rechte Seite: Barcode-Informationen
+        info_container = QWidget()
+        info_layout = QVBoxLayout(info_container)
+        info_layout.setSpacing(15)
+        
+        # Barcode-Wert
+        value_text = f"<b>Barcode:</b> {barcode.get('value', 'N/A')}"
+        value_label = QLabel(value_text)
+        value_label.setStyleSheet("font-size: 18px; color: #ECF0F1;")
+        value_label.setWordWrap(True)
+        info_layout.addWidget(value_label)
+        
+        # Barcode-Typ
+        type_text = f"<b>Typ:</b> {barcode.get('type', 'N/A')}"
+        type_label = QLabel(type_text)
+        type_label.setStyleSheet("font-size: 16px; color: #BDC3C7;")
+        info_layout.addWidget(type_label)
+        
+        info_layout.addStretch()
+        layout.addWidget(info_container, stretch=1)
+        
+        return frame
 
     def go_back(self):
         """Geht zur vorherigen Seite"""
@@ -1452,7 +1704,7 @@ class FullscreenApp(QMainWindow):
             self.progress_bar.setValue(value)
 
     def handle_output(self, script_name: str, data: Any):
-        """Verarbeitet die Ergebnisse der Worker-Threads"""
+        """Verarbeitet die Ergebnisse der Worker-Threads mit Barcode-Speicherung"""
         logger.info(f"Ergebnis von {script_name} erhalten: Typ={type(data)}")
         
         if script_name == "Abmessung":
@@ -1502,53 +1754,119 @@ class FullscreenApp(QMainWindow):
                         # BEHALTE RGB
                         self.final_images[i] = data[i]
                         logger.debug(f"Final image {i} gesetzt (Größe: {self.final_images[i].shape}, Typ: {self.final_images[i].dtype})")
-                        
-                        # Debug: Prüfe den Farbraum
-                        if len(self.final_images[i].shape) == 3:
-                            logger.debug(f"  Kanalreihenfolge: {self.final_images[i].shape[2]} Kanäle")
                     else:
                         self.final_images[i] = None
-                        logger.debug(f"Final image {i} ist None (keep={self.keep[i]})")
             else:
                 logger.error(f"Unerwartetes Format für yolo_frames: {type(data)}")
 
         elif script_name == "barcode":
-            idx = data.get("index", -1)
-            found = data.get("found", False)
-            value = data.get("value", None)
-            b_type = data.get("type", None)
+            logger.info(f"Barcode-Daten empfangen: {data}")
             
-            if found:
-                self.barcode = value
-                self.barcode_type = b_type
-                logger.info(f"Barcode erkannt: Wert='{value}', Typ='{b_type}'")
+            # Initialisiere all_barcodes wenn nötig
+            if not hasattr(self, 'all_barcodes'):
+                self.all_barcodes = []
             else:
-                logger.debug(f"Kein Barcode in Bild {idx}")
-
+                # Lösche alte Barcodes, bevor neue hinzugefügt werden
+                self.all_barcodes.clear()
+            
+            # Überprüfe den Typ von data
+            if isinstance(data, list):
+                # Falls data bereits eine Liste von Barcode-Dicts ist
+                for barcode in data:
+                    if isinstance(barcode, dict) and barcode.get("found", False):
+                        barcode_info = {
+                            "value": barcode.get("value"),
+                            "type": barcode.get("type"),
+                            "image_index": barcode.get("image_index", 0),
+                            "cropped_image": barcode.get("cropped_image")
+                        }
+                        self.all_barcodes.append(barcode_info)
+                
+                logger.info(f"{len(self.all_barcodes)} Barcodes gesammelt")
+                
+                # Debug-Ausgabe der Barcode-Daten
+                for i, barcode in enumerate(self.all_barcodes):
+                    logger.info(f"Barcode {i}: Wert={barcode.get('value')}, Typ={barcode.get('type')}")
+                    
+            elif isinstance(data, dict):
+                # Falls data ein einzelnes Barcode-Dict ist
+                if data.get("found", False):
+                    barcode_info = {
+                        "value": data.get("value"),
+                        "type": data.get("type"),
+                        "image_index": data.get("image_index", 0),
+                        "cropped_image": data.get("cropped_image")
+                    }
+                    self.all_barcodes.append(barcode_info)
+                    logger.info(f"Barcode gespeichert: {data.get('value')}")
+                else:
+                    logger.info("Barcode wurde nicht gefunden (found=False)")
+            else:
+                logger.error(f"Unerwartetes Format für barcode: {type(data)} - {data}")
+                
         elif script_name == "weight":
             self.gewicht = data
             logger.info(f"Gewicht: {data}")
-
+        
+        # Prüfe ob alle Daten vorhanden sind und aktualisiere GUI
         self._check_and_update_gui()
 
     def _check_and_update_gui(self):
         """Prüft ob alle Daten vorhanden sind und aktualisiert die GUI"""
+        # Stelle sicher, dass all_barcodes existiert
+        if not hasattr(self, 'all_barcodes'):
+            self.all_barcodes = []
+        
+        # Stelle sicher, dass abmessung und gewicht existieren
+        if not hasattr(self, 'abmessung') or self.abmessung is None:
+            self.abmessung = "Undefiniert"
+        if not hasattr(self, 'gewicht') or self.gewicht is None:
+            self.gewicht = "Undefiniert"
+        
+        # Nach der Barcode-Erkennung Zugeschnittene Bilder erstellen
+        if self.all_barcodes and hasattr(self, 'images'):
+            for barcode in self.all_barcodes:
+                if barcode.get("cropped_image") is None:
+                    img_idx = barcode.get("image_index", 0)
+                    if img_idx < len(self.images) and self.images[img_idx] is not None:
+                        img = self.images[img_idx]
+                        if img is not None:
+                            # Erstelle einen Ausschnitt um den Barcode herum
+                            h, w = img.shape[:2]
+                            crop_h = min(300, h)
+                            crop_w = min(500, w)
+                            x = max(0, w // 2 - crop_w // 2)
+                            y = max(0, h // 2 - crop_h // 2)
+                            
+                            # BGR zu RGB konvertieren für Qt
+                            roi = img[y:y+crop_h, x:x+crop_w]
+                            if len(roi.shape) == 3 and roi.shape[2] == 3:
+                                roi_rgb = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
+                            else:
+                                roi_rgb = roi
+                            
+                            barcode["cropped_image"] = roi_rgb
+        
         # Prüfe ob alle notwendigen Daten vorhanden sind
-        has_abmessung = hasattr(self, "abmessung") and self.abmessung not in [None, "Undefiniert"]
-        has_barcode = hasattr(self, "barcode") and self.barcode not in [None, "Undefiniert"]
-        has_gewicht = hasattr(self, "gewicht") and self.gewicht not in [None, "Undefiniert"]
+        has_abmessung = self.abmessung not in [None, "Undefiniert"]
+        has_gewicht = self.gewicht not in [None, "Undefiniert"]
+        has_barcodes = len(self.all_barcodes) > 0
+        has_yolo_frames = hasattr(self, "annotierte_frames") and self.annotierte_frames
         
-        # Wir aktualisieren die GUI wenn:
-        # 1. Alle Daten vorhanden sind, ODER
-        # 2. Die YOLO-Frames vorhanden sind (für Bildanzeige)
-        
+        # GUI aktualisieren wenn:
+        # 1. Alle Daten vorhanden sind (Abmessung, Gewicht), ODER
+        # 2. YOLO-Frames vorhanden sind (für Bildanzeige), ODER
+        # 3. Barcodes erkannt wurden
         update_needed = False
         
-        if has_abmessung and has_barcode and has_gewicht:
-            logger.info("Alle Daten vorhanden - aktualisiere GUI")
+        if has_abmessung and has_gewicht:
+            logger.info("Alle Hauptdaten vorhanden - aktualisiere GUI")
             update_needed = True
-        elif hasattr(self, "annotierte_frames") and self.annotierte_frames:
+        elif has_yolo_frames:
             logger.info("YOLO-Frames vorhanden - aktualisiere Bilder in GUI")
+            update_needed = True
+        elif has_barcodes:
+            logger.info("Barcodes vorhanden - aktualisiere GUI")
             update_needed = True
         
         if update_needed:
