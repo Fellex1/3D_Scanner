@@ -12,20 +12,19 @@ import sys
 import cv2
 import os
 import numpy as np
-import threading
 import logging
 import platform
-from typing import List, Tuple, Dict, Optional, Any, Union
+from typing import List, Tuple, Dict, Optional, Any
 from dataclasses import dataclass
 import json
 
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
     QPushButton, QLabel, QFrame, QSizePolicy, QStackedWidget, QScrollArea, 
-    QToolButton, QMessageBox, QDialog, QGridLayout, QProgressBar
+    QToolButton, QMessageBox, QDialog, QProgressBar
 )
 from PyQt6.QtGui import QPixmap, QIcon, QKeySequence, QShortcut, QMovie, QImage
-from PyQt6.QtCore import Qt, QSize, QThread, pyqtSignal, QObject, QRunnable, QThreadPool
+from PyQt6.QtCore import Qt, QSize, QThread, pyqtSignal
 
 # ==================== Konfiguration ====================
 @dataclass
@@ -909,120 +908,6 @@ class FullscreenApp(QMainWindow):
             button.clicked.connect(callback)
         return button
 
-    def create_barcode_card(self, barcode: Dict) -> QFrame:
-        """Erstellt eine Barcode-Karte für die Anzeige"""
-        card = QFrame()
-        card.setStyleSheet("""
-            QFrame {
-                background: #34495E;
-                border: 1px solid #5d6d7e;
-                border-radius: 12px;
-                padding: 20px;
-            }
-            QFrame:hover {
-                border: 1px solid #3498DB;
-                background: #3D566E;
-            }
-        """)
-        
-        layout = QVBoxLayout(card)
-        layout.setSpacing(15)
-        
-        # Erste Zeile: Bild und Basis-Info
-        top_layout = QHBoxLayout()
-        
-        # Barcode-Bild (zugeschnitten)
-        if "cropped_image" in barcode and barcode["cropped_image"] is not None:
-            cropped_img = barcode["cropped_image"]
-            # Füge rote Umrandung hinzu (visuelle Hervorhebung)
-            if len(cropped_img.shape) == 3:
-                # RGB zu BGR für OpenCV
-                if cropped_img.shape[2] == 3:
-                    bordered_img = cv2.copyMakeBorder(cropped_img, 5, 5, 5, 5, 
-                                                    cv2.BORDER_CONSTANT, value=(0, 0, 255))
-                else:
-                    bordered_img = cropped_img
-            else:
-                # Graubild zu RGB konvertieren
-                bordered_img = cv2.cvtColor(cropped_img, cv2.COLOR_GRAY2RGB)
-                bordered_img = cv2.copyMakeBorder(bordered_img, 5, 5, 5, 5,
-                                                cv2.BORDER_CONSTANT, value=(255, 0, 0))
-            
-            # Skaliere für einheitliche Darstellung
-            pixmap = self.convert_to_pixmap(bordered_img, width=250, height=150)
-            image_label = QLabel()
-            image_label.setPixmap(pixmap)
-            image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            top_layout.addWidget(image_label)
-        else:
-            # Platzhalter-Bild
-            placeholder = QLabel("Kein Bild verfügbar")
-            placeholder.setStyleSheet("color: #BDC3C7; font-style: italic;")
-            placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            placeholder.setFixedSize(250, 150)
-            top_layout.addWidget(placeholder)
-        
-        # Barcode-Informationen
-        info_widget = QWidget()
-        info_layout = QVBoxLayout(info_widget)
-        info_layout.setSpacing(10)
-        
-        # Barcode Wert
-        value_label = QLabel(f"<b>Barcode:</b> {barcode.get('value', 'N/A')}")
-        value_label.setStyleSheet("font-size: 16px; color: #ECF0F1;")
-        value_label.setWordWrap(True)
-        info_layout.addWidget(value_label)
-        
-        # Barcode Typ
-        type_label = QLabel(f"<b>Typ:</b> {barcode.get('type', 'N/A')}")
-        type_label.setStyleSheet("font-size: 14px; color: #BDC3C7;")
-        info_layout.addWidget(type_label)
-        
-        # Herkunftsbild
-        image_names = ["ISO-Ansicht", "Draufsicht", "Rechte Seite", "Linke Seite"]
-        image_idx = barcode.get('image_index', 0)
-        source_label = QLabel(f"<b>Quelle:</b> {image_names[image_idx] if image_idx < len(image_names) else f'Bild {image_idx}'}")
-        source_label.setStyleSheet("font-size: 14px; color: #BDC3C7;")
-        info_layout.addWidget(source_label)
-        
-        top_layout.addWidget(info_widget)
-        top_layout.addStretch()
-        layout.addLayout(top_layout)
-        
-        # Trennlinie
-        separator = QFrame()
-        separator.setFrameShape(QFrame.Shape.HLine)
-        separator.setStyleSheet("background-color: #5d6d7e;")
-        layout.addWidget(separator)
-        
-        # Zusätzliche Aktionen
-        action_layout = QHBoxLayout()
-        
-        # Kopieren-Button
-        copy_btn = QPushButton("Barcode kopieren")
-        copy_btn.setStyleSheet("""
-            QPushButton {
-                background: #7F8C8D;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 15px;
-                font-size: 12px;
-            }
-            QPushButton:hover {
-                background: #95A5A6;
-            }
-        """)
-        copy_btn.clicked.connect(lambda: self.copy_to_clipboard(barcode.get('value', '')))
-        
-        action_layout.addWidget(copy_btn)
-        action_layout.addStretch()
-        
-        layout.addLayout(action_layout)
-        
-        return card
-
-
     def sap_integration_placeholder(self):
         """Platzhalter für SAP-Integration"""
         QMessageBox.information(self, "SAP-Integration", 
@@ -1388,14 +1273,14 @@ class FullscreenApp(QMainWindow):
                 barcode_card = ("custom", self.create_barcode_widget(barcode, i))
                 content.append([barcode_card])
         else:
-            # Keine Barcodes gefunden
-            no_barcodes_text = "Keine Barcodes erkannt"
+            # Keine Barcodes gefunden - übersetzt
+            no_barcodes_text = self.translator.get_text(self.language, "storage", "no_barcodes")
             content.append([("text", no_barcodes_text)])
         
-        # Buttons am Ende (SAP-Eintrag, Lokal speichern)
+        # Buttons am Ende (SAP-Eintrag, Lokal speichern) - übersetzt
         content.append([
-            ("button", "SAP-Eintrag", self.sap_integration_placeholder),
-            ("button", "Lokal speichern", self.local_save_placeholder)
+            ("button", self.translator.get_text(self.language, "storage", "sap_btn"), self.sap_integration_placeholder),
+            ("button", self.translator.get_text(self.language, "storage", "save_btn"), self.local_save_placeholder)
         ])
         
         return content
@@ -1445,7 +1330,12 @@ class FullscreenApp(QMainWindow):
             image_layout.addWidget(image_label)
             
             # Bildquelle
-            image_names = ["ISO-Ansicht", "Draufsicht", "Rechte Seite", "Linke Seite"]
+            image_names = [
+                self.translator.get_text(self.language, "photo", "iso_image"),  # Falls vorhanden
+                self.translator.get_text(self.language, "photo", "top_image"),   # Falls vorhanden
+                self.translator.get_text(self.language, "photo", "right_image"), # Falls vorhanden
+                self.translator.get_text(self.language, "photo", "behind_image") # Falls vorhanden
+            ]
             img_idx = barcode.get('image_index', 0)
             source_text = f"Quelle: {image_names[img_idx] if img_idx < len(image_names) else f'Bild {img_idx}'}"
             source_label = QLabel(source_text)
@@ -1789,7 +1679,7 @@ class FullscreenApp(QMainWindow):
                     logger.info(f"Barcode {i}: Wert={barcode.get('value')}, Typ={barcode.get('type')}")
                     
             elif isinstance(data, dict):
-                # Falls data ein einzelnes Barcode-Dict ist
+                # Falls data ein einzelnes Barcode-Dict ist (für Kompatibilität)
                 if data.get("found", False):
                     barcode_info = {
                         "value": data.get("value"),

@@ -2160,3 +2160,260 @@
 2025-12-09 15:30:11,286 - __main__ - INFO - Bereits auf letzter Seite
 2025-12-09 15:30:11,664 - __main__ - INFO - go_back: Aktuelle Seite 3, scan_start=False
 2025-12-09 15:30:13,930 - __main__ - INFO - go_next: Aktuelle Seite 2, scan_start=False
+2025-12-09 15:37:42,557 - __main__ - INFO - 3D-Scanner wird gestartet...
+2025-12-09 15:37:44,525 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
+2025-12-09 15:37:51,795 - __main__ - INFO - Sprache geändert zu: it
+2025-12-09 15:37:53,411 - __main__ - INFO - go_next: Aktuelle Seite 0, scan_start=False
+2025-12-09 15:37:53,411 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
+2025-12-09 15:37:55,322 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2025-12-09 15:37:56,304 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2025-12-09 15:37:57,779 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2025-12-09 15:37:58,742 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2025-12-09 15:38:00,944 - __main__ - INFO - go_next: Aktuelle Seite 1, scan_start=True
+2025-12-09 15:38:00,984 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'int'>
+2025-12-09 15:38:00,985 - __main__ - INFO - Gewicht: 5
+2025-12-09 15:38:05,597 - BarCode_v02 - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
+2025-12-09 15:38:05,711 - __main__ - INFO - Analysiere Bild 0 (iso_Bild) auf Barcodes...
+2025-12-09 15:38:05,878 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
+2025-12-09 15:38:05,881 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
+2025-12-09 15:38:06,316 - BarCode_v02 - INFO - Barcode erkannt in Bild 0: 1234567890128 (Typ: EAN13)
+2025-12-09 15:38:06,317 - BarCode_v02 - INFO - Bild 0: 1 Barcode(s) erkannt
+2025-12-09 15:38:06,317 - __main__ - INFO - Bild 0: 1 Barcode(s) erkannt
+2025-12-09 15:38:06,318 - __main__ - INFO - Analysiere Bild 1 (top_Bild) auf Barcodes...
+2025-12-09 15:38:06,626 - BarCode_v02 - INFO - Barcode erkannt in Bild 1: 1234567890128 (Typ: EAN13)
+2025-12-09 15:38:06,626 - BarCode_v02 - INFO - Bild 1: 1 Barcode(s) erkannt
+2025-12-09 15:38:06,627 - __main__ - INFO - Bild 1: 1 Barcode(s) erkannt
+2025-12-09 15:38:06,627 - __main__ - INFO - Analysiere Bild 2 (right_Bild) auf Barcodes...
+2025-12-09 15:38:06,890 - BarCode_v02 - INFO - Barcode erkannt in Bild 2: 1234567890128 (Typ: EAN13)
+2025-12-09 15:38:06,891 - BarCode_v02 - INFO - Bild 2: 1 Barcode(s) erkannt
+2025-12-09 15:38:06,891 - __main__ - INFO - Bild 2: 1 Barcode(s) erkannt
+2025-12-09 15:38:06,891 - __main__ - INFO - Analysiere Bild 3 (behind_Bild) auf Barcodes...
+2025-12-09 15:38:07,182 - BarCode_v02 - INFO - Barcode erkannt in Bild 3: 1234567890128 (Typ: EAN13)
+2025-12-09 15:38:07,183 - BarCode_v02 - INFO - Bild 3: 1 Barcode(s) erkannt
+2025-12-09 15:38:07,184 - __main__ - INFO - Bild 3: 1 Barcode(s) erkannt
+2025-12-09 15:38:07,184 - __main__ - INFO - Insgesamt 4 Barcodes in 4 Bildern erkannt
+2025-12-09 15:38:07,186 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
+2025-12-09 15:38:07,187 - __main__ - INFO - Barcode-Daten empfangen: {'found': True, 'value': '1234567890128', 'type': 'EAN13', 'image_index': 0, 'cropped_image': array([[[173, 188, 201],
+        [174, 187, 201],
+        [174, 187, 201],
+        ...,
+        [169, 178, 188],
+        [171, 180, 190],
+        [169, 178, 188]],
+
+       [[174, 187, 201],
+        [175, 188, 202],
+        [175, 188, 202],
+        ...,
+        [172, 181, 191],
+        [172, 181, 191],
+        [171, 180, 190]],
+
+       [[174, 187, 201],
+        [174, 187, 201],
+        [175, 188, 202],
+        ...,
+        [172, 181, 191],
+        [173, 182, 192],
+        [172, 181, 191]],
+
+       ...,
+
+       [[183, 189, 205],
+        [182, 190, 198],
+        [181, 189, 197],
+        ...,
+        [172, 184, 191],
+        [171, 183, 190],
+        [171, 183, 190]],
+
+       [[183, 192, 204],
+        [182, 192, 197],
+        [181, 191, 196],
+        ...,
+        [171, 183, 190],
+        [171, 183, 190],
+        [172, 181, 191]],
+
+       [[183, 192, 204],
+        [183, 193, 198],
+        [182, 192, 197],
+        ...,
+        [171, 183, 190],
+        [170, 182, 189],
+        [172, 181, 191]]], dtype=uint8)}
+2025-12-09 15:38:07,188 - __main__ - INFO - Barcode gespeichert: 1234567890128
+2025-12-09 15:38:07,189 - __main__ - INFO - Barcodes vorhanden - aktualisiere GUI
+2025-12-09 15:38:07,331 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
+2025-12-09 15:38:07,333 - __main__ - INFO - Barcode-Daten empfangen: {'found': True, 'value': '1234567890128', 'type': 'EAN13', 'image_index': 1, 'cropped_image': array([[[179, 183, 197],
+        [178, 182, 196],
+        [178, 182, 196],
+        ...,
+        [167, 175, 183],
+        [167, 175, 183],
+        [165, 173, 181]],
+
+       [[178, 182, 194],
+        [178, 182, 194],
+        [177, 181, 193],
+        ...,
+        [167, 175, 183],
+        [167, 175, 183],
+        [166, 174, 182]],
+
+       [[178, 182, 194],
+        [177, 181, 193],
+        [177, 181, 193],
+        ...,
+        [168, 176, 184],
+        [167, 175, 183],
+        [167, 175, 183]],
+
+       ...,
+
+       [[183, 188, 195],
+        [183, 188, 195],
+        [182, 187, 194],
+        ...,
+        [172, 180, 188],
+        [172, 180, 188],
+        [174, 182, 190]],
+
+       [[182, 190, 196],
+        [183, 188, 195],
+        [183, 188, 195],
+        ...,
+        [166, 175, 185],
+        [166, 175, 185],
+        [170, 178, 186]],
+
+       [[181, 189, 195],
+        [183, 188, 195],
+        [183, 188, 195],
+        ...,
+        [171, 180, 190],
+        [166, 175, 185],
+        [168, 176, 184]]], dtype=uint8)}
+2025-12-09 15:38:07,334 - __main__ - INFO - Barcode gespeichert: 1234567890128
+2025-12-09 15:38:07,335 - __main__ - INFO - Barcodes vorhanden - aktualisiere GUI
+2025-12-09 15:38:07,480 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
+2025-12-09 15:38:07,487 - __main__ - INFO - Barcode-Daten empfangen: {'found': True, 'value': '1234567890128', 'type': 'EAN13', 'image_index': 2, 'cropped_image': array([[[179, 183, 197],
+        [178, 182, 196],
+        [178, 182, 196],
+        ...,
+        [168, 173, 182],
+        [168, 173, 182],
+        [168, 173, 182]],
+
+       [[179, 183, 197],
+        [178, 182, 196],
+        [178, 182, 196],
+        ...,
+        [168, 173, 182],
+        [168, 173, 182],
+        [168, 173, 182]],
+
+       [[179, 183, 197],
+        [178, 182, 196],
+        [178, 182, 196],
+        ...,
+        [168, 173, 182],
+        [169, 174, 183],
+        [169, 174, 183]],
+
+       ...,
+
+       [[185, 188, 198],
+        [184, 187, 197],
+        [184, 187, 197],
+        ...,
+        [176, 185, 207],
+        [172, 180, 186],
+        [173, 181, 187]],
+
+       [[184, 187, 197],
+        [184, 187, 197],
+        [184, 187, 197],
+        ...,
+        [156, 162, 182],
+        [168, 176, 184],
+        [172, 180, 188]],
+
+       [[184, 187, 197],
+        [184, 187, 197],
+        [184, 187, 197],
+        ...,
+        [118, 124, 144],
+        [162, 170, 178],
+        [172, 180, 188]]], dtype=uint8)}
+2025-12-09 15:38:07,490 - __main__ - INFO - Barcode gespeichert: 1234567890128
+2025-12-09 15:38:07,490 - __main__ - INFO - Barcodes vorhanden - aktualisiere GUI
+2025-12-09 15:38:07,606 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
+2025-12-09 15:38:07,608 - __main__ - INFO - Barcode-Daten empfangen: {'found': True, 'value': '1234567890128', 'type': 'EAN13', 'image_index': 3, 'cropped_image': array([[[175, 183, 198],
+        [173, 181, 196],
+        [173, 181, 196],
+        ...,
+        [161, 176, 182],
+        [161, 176, 182],
+        [160, 175, 181]],
+
+       [[178, 186, 201],
+        [176, 184, 199],
+        [174, 180, 196],
+        ...,
+        [163, 175, 182],
+        [162, 174, 181],
+        [162, 174, 181]],
+
+       [[179, 187, 202],
+        [179, 187, 202],
+        [179, 185, 201],
+        ...,
+        [162, 174, 181],
+        [162, 174, 181],
+        [162, 174, 181]],
+
+       ...,
+
+       [[180, 189, 199],
+        [180, 189, 199],
+        [179, 188, 198],
+        ...,
+        [166, 174, 180],
+        [167, 175, 181],
+        [170, 175, 180]],
+
+       [[180, 189, 199],
+        [180, 189, 199],
+        [180, 189, 199],
+        ...,
+        [162, 176, 187],
+        [162, 176, 187],
+        [165, 177, 184]],
+
+       [[180, 189, 199],
+        [180, 189, 199],
+        [179, 188, 198],
+        ...,
+        [165, 179, 190],
+        [163, 177, 188],
+        [165, 177, 184]]], dtype=uint8)}
+2025-12-09 15:38:07,610 - __main__ - INFO - Barcode gespeichert: 1234567890128
+2025-12-09 15:38:07,610 - __main__ - INFO - Barcodes vorhanden - aktualisiere GUI
+2025-12-09 15:38:08,890 - __main__ - INFO - Bild 0: YOLO erkannt - 355 x 400
+2025-12-09 15:38:08,891 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
+2025-12-09 15:38:11,263 - __main__ - INFO - Bild 1: YOLO erkannt - 372 x 320
+2025-12-09 15:38:11,263 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
+2025-12-09 15:38:13,599 - __main__ - INFO - Bild 2: YOLO erkannt - 409 x 318
+2025-12-09 15:38:13,600 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
+2025-12-09 15:38:15,958 - __main__ - INFO - Bild 3: YOLO erkannt - 419 x 316
+2025-12-09 15:38:15,959 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['355 x 400', '372 x 320', '409 x 318', '419 x 316']
+2025-12-09 15:38:15,960 - __main__ - INFO - Ergebnis von Abmessung erhalten: Typ=<class 'list'>
+2025-12-09 15:38:15,960 - __main__ - INFO - Abmessungen erhalten: ['355 x 400', '372 x 320', '409 x 318', '419 x 316']
+2025-12-09 15:38:15,961 - __main__ - INFO - Gesamt-Abmessung berechnet: 355 x 355 x 400
+2025-12-09 15:38:15,962 - __main__ - INFO - Alle Hauptdaten vorhanden - aktualisiere GUI
+2025-12-09 15:38:16,063 - __main__ - INFO - Ergebnis von yolo_frames erhalten: Typ=<class 'list'>
+2025-12-09 15:38:16,064 - __main__ - INFO - Erhalte 4 annotierte Frames
+2025-12-09 15:38:16,064 - __main__ - INFO - Alle Hauptdaten vorhanden - aktualisiere GUI
+2025-12-09 15:38:16,163 - __main__ - INFO - Alle Tasks fertig
+2025-12-09 15:38:18,999 - __main__ - INFO - go_next: Aktuelle Seite 2, scan_start=False
