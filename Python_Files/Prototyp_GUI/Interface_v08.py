@@ -1,7 +1,6 @@
 #Interface_v08.py
-"""=======TODO-Liste v0.6=======
+"""=======TODO-Liste v0.8=======
 Objekt-Detection muss verbessert werden
-Lade-Dialog schöner gestalten
 Fehlerbehandlung bei Kamerazugriff
 SAP-Integration                 (Platzhalter-Button/optional)
 Lokal speichern Integration     (Platzhalter-Button)
@@ -121,10 +120,36 @@ class TranslationManager:
                 "no_barcodes": ("Keine Barcodes erkannt", "No barcodes detected", "Nessun codice a barre rilevato"),
                 "sap_btn": ("SAP-Eintrag", "SAP Entry", "SAP Entry"),
                 "save_btn": ("Lokal speichern", "Save Locally", "Salva localmente"),
+                "rebeginn_btn": ("Neu Beginnen", "Restart", "Riavvia"),
+
                 "barcode_label": ("Barcode:", "Barcode:", "Codice a barre:"),
                 "type_label": ("Typ:", "Type:", "Tipo:"),
                 "source_label": ("Quelle:", "Source:", "Fonte:"),
                 "manual_entry": ("Manuelle Eingabe", "Manual Entry", "Ingresso Manuale")
+            },
+            "messagebox": {
+                "camera_error": ("Kamerafehler", "Camera Error", "Errore Fotocamera"),
+                "measurement_error": ("Messfehler", "Measurement Error", "Errore di Misura"),
+                "storage_error": ("Speicherfehler", "Storage Error", "Errore di Memoria"),
+                "data_loss_confirm": ("Datenverlust bestätigen", "Confirm Data Loss", "Conferma Perdita Dati"),
+                "data_loss_message": ("Möchten Sie wirklich zurück zur Startseite? Alle erfassten Daten gehen verloren.", "Do you really want to go back to the start page? All captured data will be lost.", "Vuoi davvero tornare alla pagina iniziale? Tutti i dati acquisiti saranno persi."),
+                "cancel_confirm": ("Abbrechen", "Cancel", "Annulla"),
+                "scan_aborted_title": ("Scan abgebrochen", "Scan Aborted", "Scansione Annullata"),
+                "scan_aborted_message": ("Der Scan wurde abgebrochen.", "The scan has been aborted.", "La scansione è stata annullata."),
+                "scan_completed_title": ("Scan abgeschlossen", "Scan Completed", "Scansione Completata"),
+                "scan_completed_message": ("Der Scan war erfolgreich!\nDie Daten stehen nun zur Verfügung.", "The scan was successful!\nThe data is now available.", "La scansione è stata completata con successo!\nI dati sono ora disponibili."),
+                "no_images_title": ("Keine Bilder", "No Images", "Nessuna Immagine"),
+                "no_images_message": ("Bitte nehmen Sie zuerst Bilder auf, bevor Sie fortfahren.", "Please take pictures first before continuing.", "Per favore scatta prima le foto prima di continuare."),
+                "no_barcodes_title": ("Keine Barcodes", "No Barcodes", "Nessun Codice a Barre"),
+                "no_barcodes_message": ("Es wurden keine Barcodes zum Speichern gefunden.", "No barcodes were found to save.", "Non è stato trovato alcun codice a barre da salvare."),
+                "save_error_title": ("Speicherfehler", "Save Error", "Errore di Salvataggio"),
+                "save_error_message": ("Fehler beim Speichern der Daten.", "Error saving data.", "Errore durante il salvataggio dei dati."),
+                "save_success_title": ("Erfolgreich gespeichert", "Save Successful", "Salvataggio Riuscito"),
+                "save_success_message": ("{count} Barcode(s) wurden lokal gespeichert.", "{count} barcode(s) have been saved locally.", "{count} codice(i) a barre sono stati salvati localmente."),
+                "sap_integration_title": ("SAP-Integration", "SAP Integration", "Integrazione SAP"),
+                "sap_integration_message": ("SAP-Integration würde jetzt gestartet werden...", "SAP Integration would now be started...", "L'integrazione SAP verrà ora avviata..."),
+                "save_local_title": ("Lokales Speichern", "Local Save", "Salvataggio Locale"),
+                "save_local_message": ("Daten würden jetzt lokal gespeichert werden...", "Data would now be saved locally...", "I dati verrebbero ora salvati localmente...")
             }
         }
         
@@ -623,6 +648,7 @@ class FullscreenApp(QMainWindow):
         btn.clicked.connect(lambda _, lang=language_code: self.set_language(lang))
         return btn
 
+
     def create_start_page(self) -> QWidget:
         """Erstellt die Startseite"""
         page = QWidget()
@@ -915,14 +941,17 @@ class FullscreenApp(QMainWindow):
 
     def sap_integration_placeholder(self):
         """Platzhalter für SAP-Integration"""
-        QMessageBox.information(self, "SAP-Integration", 
-                            "SAP-Integration würde jetzt gestartet werden...")
+        QMessageBox.information(self, 
+                                self.translator.get_text(self.language, "start", "sap_integration_title"), 
+                                self.translator.get_text(self.language, "start", "sap_integration_message"))
+
         logger.info("SAP-Integration Button gedrückt")
 
     def local_save_placeholder(self):
         """Platzhalter für lokales Speichern"""
-        QMessageBox.information(self, "Lokales Speichern", 
-                            "Daten würden jetzt lokal gespeichert werden...")
+        QMessageBox.information(self, 
+                                self.translator.get_text(self.language, "start", "local_save_title"), 
+                                self.translator.get_text(self.language, "start", "local_save_message"))
         logger.info("Lokales Speichern Button gedrückt")
         
     def convert_to_pixmap(self, frame: np.ndarray, width: int = 300, height: int = 300) -> QPixmap:
@@ -1267,6 +1296,31 @@ class FullscreenApp(QMainWindow):
         self.stack.setCurrentIndex(current_page)
         self.update_buttons()
 
+    
+
+    def rebeginn_application(self):
+        """Startet die Anwendung von der Startseite neu"""
+        if QMessageBox.question(self, self.translator.get_text(self.language, "messagebox", "data_loss_confirm"), 
+                                          self.translator.get_text(self.language, "messagebox", "data_loss_message"),
+                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel) == QMessageBox.StandardButton.Cancel:
+            return
+        
+        self.abmessung = None
+        self.gewicht = None
+        self.barcode = None
+        self.barcode_type = None
+        self.images = [None] * CONFIG.NUM_CAMERAS
+        self.final_images = [None] * CONFIG.NUM_CAMERAS
+        self.keep = [True] * CONFIG.NUM_CAMERAS
+        self.scan_start = False
+        self.all_barcodes = []
+        self.load_pages()
+        self.stack.setCurrentIndex(0)
+        self.update_buttons()
+        logger.info("Anwendung wurde neu gestartet")
+        
+
+
     def get_storage_page_content(self) -> List[Any]:
         """Erzeugt den dynamischen Inhalt für die Storage Pages basierend auf erkannten Barcodes"""
         content = []
@@ -1302,7 +1356,8 @@ class FullscreenApp(QMainWindow):
         # Buttons am Ende (SAP-Eintrag, Lokal speichern) - übersetzt
         content.append([
             ("button", self.translator.get_text(self.language, "storage", "sap_btn"), self.sap_integration_placeholder),
-            ("button", self.translator.get_text(self.language, "storage", "save_btn"), self.save_barcodes_locally)
+            ("button", self.translator.get_text(self.language, "storage", "save_btn"), self.save_barcodes_locally),
+            ("button", self.translator.get_text(self.language, "storage", "rebeginn_btn"), self.rebeginn_application)
         ])
         
         return content
@@ -1494,22 +1549,22 @@ class FullscreenApp(QMainWindow):
                 
                 QMessageBox.information(
                     self,
-                    "Erfolgreich gespeichert",
-                    f"{len(barcode_data)} Barcode(s) wurden lokal gespeichert."
+                    self.translator.get_text(self.language, "messagebox","save_success_title"),
+                    self.translator.get_text(self.language, "messagebox","save_success_message").format(count=len(barcode_data))
                 )
                 logger.info(f"{len(barcode_data)} Barcode(s) lokal gespeichert")
             except Exception as e:
                 QMessageBox.critical(
                     self,
-                    "Fehler beim Speichern",
-                    f"Die Barcodes konnten nicht gespeichert werden: {str(e)}"
+                    self.translator.get_text(self.language, "messagebox","save_error_title"),
+                    self.translator.get_text(self.language, "messagebox","save_error_message").format(error=str(e))
                 )
                 logger.error(f"Fehler beim Speichern der Barcodes: {e}")
         else:
             QMessageBox.warning(
                 self,
-                "Keine Barcodes",
-                "Es wurden keine Barcodes zum Speichern gefunden."
+                self.language.get_text(self.language, "messagebox","no_barcodes_title"),
+                self.language.get_text(self.language, "messagebox","no_barcodes_message")
             )
 
     def go_back(self):
@@ -1519,16 +1574,13 @@ class FullscreenApp(QMainWindow):
         
         # Spezialfall: Von Foto-Auswahl (Index 1) zurück zur Startseite (Index 0)
         if idx == 1:
-            self.scan_start = False
-            reply = QMessageBox.question(
-                self,
-                "Datenverlust bestätigen",
-                "Möchten Sie wirklich zurück zur Startseite? Alle erfassten Daten gehen verloren.",
-                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
-
-            if reply == QMessageBox.StandardButton.Cancel:
+            if QMessageBox.question(self, self.translator.get_text(self.language, "messagebox", "data_loss_confirm"), 
+                                          self.translator.get_text(self.language, "messagebox", "data_loss_message"),
+                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel) == QMessageBox.StandardButton.Cancel:
                 return
-        
+            self.scan_start = False
+
+
         # Spezialfall: Von Kamera-Übersicht (Index 2) zurück zur Foto-Auswahl (Index 1)
         if idx == 2:
             # Setze scan_start zurück, damit wir neue Bilder aufnehmen können
@@ -1578,8 +1630,8 @@ class FullscreenApp(QMainWindow):
             else:
                 QMessageBox.warning(
                     self,
-                    "Keine Bilder",
-                    "Bitte nehmen Sie zuerst Bilder auf, bevor Sie fortfahren."
+                    self.translator.get_text(self.language, "messagebox", "no_images_title"),
+                    self.translator.get_text(self.language, "messagebox", "no_images_message")
                 )
         elif idx == 2:
             self.stack.setCurrentIndex(idx + 1)
@@ -1649,8 +1701,8 @@ class FullscreenApp(QMainWindow):
                 self.scan_start = False
                 QMessageBox.information(
                     self,
-                    "Scan abgeschlossen",
-                    "Der Scan war erfolgreich!\nDie Daten stehen nun zur Verfügung."
+                    self.translator.get_text(self.language, "messagebox", "scan_completed_title"),
+                    self.translator.get_text(self.language, "messagebox", "scan_completed_message")
                 )
         
         def cancel_loading():
@@ -1666,8 +1718,8 @@ class FullscreenApp(QMainWindow):
             self.update_buttons()
             QMessageBox.warning(
                 self,
-                "Scan abgebrochen",
-                "Der Scan wurde abgebrochen."
+                self.translator.get_text(self.language, "messagebox", "scan_aborted_title"),
+                self.translator.get_text(self.language, "messagebox", "scan_aborted_message")
             )
         
         # Verbindungen herstellen
