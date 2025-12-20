@@ -3,11 +3,11 @@
 Objekt-Detection muss verbessert werden
 Fehlerbehandlung bei Kamerazugriff
 SAP-Integration                 (Platzhalter-Button/optional)
-Lokal speichern Integration     (Platzhalter-Button)
-GUI-Design verbessern           (optional)
+Lokal speichern Integration     (Formatierung?)
 ================================"""
 
 import os
+import csv
 import sys
 import cv2
 import json
@@ -77,7 +77,7 @@ class TranslationManager:
         # Struktur: (Deutsch, Englisch, Italienisch)
         self.translations = {
             "start": {
-                "title": ("3D-Scanner Interface", "3D Scanner Interface", "Interfaccia Scanner 3D"),
+                "title": ("3D Scanner Interface", "3D Scanner Interface", "3D Scanner Interfaccia"),
                 "subtitle": ("Interface um den 3D-Scanner zu bedienen", "Interface to operate the 3D scanner", "Interfaccia per gestire lo scanner 3D"),
                 "instruction1": ("Bitte lege den Artikel der gescannt werden soll in die Box ein", "Please place the item to be scanned in the box", "Si prega di posizionare l'articolo nella scatola"),
                 "instruction2": ("Stellen Sie sicher, dass der Artikel vollständig im Sichtfeld aller Kameras liegt", "Make sure the item is completely in the field of view of all cameras", "Assicurarsi che l'articolo sia completamente nel campo visivo di tutte le telecamere"),
@@ -946,13 +946,6 @@ class FullscreenApp(QMainWindow):
                                 self.translator.get_text(self.language, "start", "sap_integration_message"))
 
         logger.info("SAP-Integration Button gedrückt")
-
-    def local_save_placeholder(self):
-        """Platzhalter für lokales Speichern"""
-        QMessageBox.information(self, 
-                                self.translator.get_text(self.language, "start", "local_save_title"), 
-                                self.translator.get_text(self.language, "start", "local_save_message"))
-        logger.info("Lokales Speichern Button gedrückt")
         
     def convert_to_pixmap(self, frame: np.ndarray, width: int = 300, height: int = 300) -> QPixmap:
         """Konvertiert OpenCV-Bild zu QPixmap"""
@@ -1296,8 +1289,6 @@ class FullscreenApp(QMainWindow):
         self.stack.setCurrentIndex(current_page)
         self.update_buttons()
 
-    
-
     def rebeginn_application(self):
         """Startet die Anwendung von der Startseite neu"""
         if QMessageBox.question(self, self.translator.get_text(self.language, "messagebox", "data_loss_confirm"), 
@@ -1318,7 +1309,6 @@ class FullscreenApp(QMainWindow):
         self.stack.setCurrentIndex(0)
         self.update_buttons()
         logger.info("Anwendung wurde neu gestartet")
-        
 
 
     def get_storage_page_content(self) -> List[Any]:
@@ -1356,12 +1346,11 @@ class FullscreenApp(QMainWindow):
         # Buttons am Ende (SAP-Eintrag, Lokal speichern) - übersetzt
         content.append([
             ("button", self.translator.get_text(self.language, "storage", "sap_btn"), self.sap_integration_placeholder),
-            ("button", self.translator.get_text(self.language, "storage", "save_btn"), self.save_barcodes_locally),
+            ("button", self.translator.get_text(self.language, "storage", "save_btn"), self.save_all_data_csv),
             ("button", self.translator.get_text(self.language, "storage", "rebeginn_btn"), self.rebeginn_application)
         ])
         
         return content
-
 
     def create_editable_barcode_widget(self, barcode: Dict, index: int) -> QFrame:
         """Erstellt ein bearbeitbares Barcode-Widget mit Eingabefeldern"""
@@ -1525,47 +1514,133 @@ class FullscreenApp(QMainWindow):
         if index < len(self.all_barcodes):
             self.all_barcodes[index]['type'] = barcode_type
 
-    def save_barcodes_locally(self):
-        """Speichert die bearbeiteten Barcode-Daten lokal"""
-        barcode_data = []
-        
-        # Sammle alle Barcode-Daten
-        if hasattr(self, 'all_barcodes'):
-            for barcode in self.all_barcodes:
-                if barcode.get('value'):  # Nur speichern wenn ein Wert vorhanden ist
-                    barcode_data.append({
-                        'barcode': barcode.get('value', ''),
-                        'type': barcode.get('type', 'EAN13'),
-                        'source': barcode.get('image_index', 'Manuelle Eingabe'),
-                        'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    })
-        
-        if barcode_data:
-            # In Datei speichern
-            try:
-                import json
-                with open('barcode_data.json', 'w', encoding='utf-8') as f:
-                    json.dump(barcode_data, f, indent=4, ensure_ascii=False)
+    def save_all_data_csv(self):
+        """Speichert alle Daten in CSV gemäß der Tabelle"""
+        try:
+            # Ordner für Bilder erstellen
+            scan_folder = f"Scan_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            os.makedirs(scan_folder, exist_ok=True)
+            
+            # ISO-Bild speichern (erste Kamera)
+            iso_bild_pfad = ""
+            if self.images and len(self.images) > 0 and self.images[0] is not None:
+                iso_bild_datei = "iso_bild.jpg"
+                iso_bild_pfad = os.path.join(scan_folder, iso_bild_datei)
                 
-                QMessageBox.information(
-                    self,
-                    self.translator.get_text(self.language, "messagebox","save_success_title"),
-                    self.translator.get_text(self.language, "messagebox","save_success_message").format(count=len(barcode_data))
-                )
-                logger.info(f"{len(barcode_data)} Barcode(s) lokal gespeichert")
-            except Exception as e:
-                QMessageBox.critical(
-                    self,
-                    self.translator.get_text(self.language, "messagebox","save_error_title"),
-                    self.translator.get_text(self.language, "messagebox","save_error_message").format(error=str(e))
-                )
-                logger.error(f"Fehler beim Speichern der Barcodes: {e}")
-        else:
-            QMessageBox.warning(
+                # Konvertiere RGB zu BGR für OpenCV
+                if len(self.images[0].shape) == 3 and self.images[0].shape[2] == 3:
+                    bgr_img = cv2.cvtColor(self.images[0], cv2.COLOR_RGB2BGR)
+                else:
+                    bgr_img = self.images[0]
+                
+                cv2.imwrite(iso_bild_pfad, bgr_img)
+            
+            # Andere Bilder auch speichern (optional)
+            bild_namen = ["top_bild", "right_bild", "behind_bild"]
+            for i in range(1, min(len(self.images), 4)):
+                if self.images[i] is not None:
+                    bild_datei = f"{bild_namen[i-1]}.jpg"
+                    bild_pfad = os.path.join(scan_folder, bild_datei)
+                    
+                    if len(self.images[i].shape) == 3 and self.images[i].shape[2] == 3:
+                        bgr_img = cv2.cvtColor(self.images[i], cv2.COLOR_RGB2BGR)
+                    else:
+                        bgr_img = self.images[i]
+                    
+                    cv2.imwrite(bild_pfad, bgr_img)
+            
+            # CSV-Datei erstellen
+            csv_datei = os.path.join(scan_folder, "scanner_daten.csv")
+            
+            with open(csv_datei, 'w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.writer(csvfile, delimiter=';')
+                
+                # Kopfzeile
+                writer.writerow([
+                    "Interne_Materialnummer",
+                    "Gewicht [kg]",
+                    "Abmessungen L [mm]",
+                    "Abmessungen B [mm]", 
+                    "Abmessungen H [mm]",
+                    "EAN-Code",
+                    "Iso_Bild"
+                ])
+                
+                # Abmessungen parsen
+                laenge = breite = hoehe = 0
+                if self.abmessung and self.abmessung != "Undefiniert":
+                    try:
+                        teile = self.abmessung.split(" x ")
+                        if len(teile) >= 2:
+                            laenge = float(teile[0])
+                            breite = float(teile[1])
+                            hoehe = float(teile[2]) if len(teile) > 2 else 0
+                    except:
+                        pass
+                
+                # Gewicht parsen
+                gewicht = 0
+                if self.gewicht and self.gewicht != "Undefiniert":
+                    try:
+                        gewicht_str = str(self.gewicht).replace("kg", "").strip()
+                        gewicht = float(gewicht_str)
+                    except:
+                        pass
+                
+                # Für jeden Barcode eine Zeile erstellen (nur EAN/UPC)
+                ean_barcodes = []
+                for barcode in self.all_barcodes:
+                    barcode_type = barcode.get("type", "").upper()
+                    if barcode_type in ["EAN13", "EAN8", "UPC-A", "UPC-E", "EAN", "UPC"]:
+                        ean_barcodes.append(barcode)
+                
+                if ean_barcodes:
+                    for barcode in ean_barcodes:
+                        writer.writerow([
+                            "",  # Interne_Materialnummer (leer)
+                            f"{gewicht:.3f}".replace(".", ","),  # Gewicht mit Komma
+                            f"{laenge:.0f}".replace(".", ","),  # Länge ohne Dezimalstellen
+                            f"{breite:.0f}".replace(".", ","),  # Breite ohne Dezimalstellen
+                            f"{hoehe:.0f}".replace(".", ","),  # Höhe ohne Dezimalstellen
+                            barcode.get("value", ""),  # EAN-Code
+                            iso_bild_pfad if iso_bild_pfad else ""  # Pfad zum Bild
+                        ])
+                else:
+                    # Eine Zeile ohne Barcode
+                    writer.writerow([
+                        "",  # Interne_Materialnummer
+                        f"{gewicht:.3f}".replace(".", ","),
+                        f"{laenge:.0f}".replace(".", ","),
+                        f"{breite:.0f}".replace(".", ","),
+                        f"{hoehe:.0f}".replace(".", ","),
+                        "",  # Kein EAN-Code
+                        iso_bild_pfad if iso_bild_pfad else ""
+                    ])
+            
+            # Erfolgsmeldung
+            QMessageBox.information(
                 self,
-                self.language.get_text(self.language, "messagebox","no_barcodes_title"),
-                self.language.get_text(self.language, "messagebox","no_barcodes_message")
+                "CSV erstellt",
+                f"Alle Daten wurden gespeichert:\n"
+                f"Ordner: {scan_folder}\n"
+                f"CSV: scanner_daten.csv\n"
+                f"Bilder: iso_bild.jpg, top_bild.jpg, right_bild.jpg, behind_bild.jpg\n\n"
+                f"EAN-Codes: {len(ean_barcodes)}"
             )
+            
+            logger.info(f"Daten gespeichert in: {scan_folder}")
+            
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Speicherfehler",
+                f"Fehler beim Speichern:\n{str(e)}"
+            )
+            logger.error(f"Fehler in save_all_data_csv: {e}")
+
+
+
+
 
     def go_back(self):
         """Geht zur vorherigen Seite"""
@@ -1993,8 +2068,5 @@ if __name__ == "__main__":
     w = FullscreenApp()
     w.show()
     sys.exit(app.exec())
-
-
-
 
 
