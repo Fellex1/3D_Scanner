@@ -1,9 +1,10 @@
 #Interface_v08.py
 """=======TODO-Liste v0.8=======
 Objekt-Detection muss verbessert werden
-Fehlerbehandlung bei Kamerazugriff
+Gewicht-Messung muss implementiert werden
 SAP-Integration                 (Platzhalter-Button/optional)
 Lokal speichern Integration     (Formatierung?)
+Artikel Nummer eingeben
 ================================"""
 
 import os
@@ -120,12 +121,17 @@ class TranslationManager:
                 "no_barcodes": ("Keine Barcodes erkannt", "No barcodes detected", "Nessun codice a barre rilevato"),
                 "sap_btn": ("SAP-Eintrag", "SAP Entry", "SAP Entry"),
                 "save_btn": ("Lokal speichern", "Save Locally", "Salva localmente"),
-                "rebeginn_btn": ("Neu Beginnen", "Restart", "Riavvia"),
-
+                "restart_btn": ("Neu Beginnen", "Restart", "Riavvia"),
+                "add_barcode_btn": ("Weiteren Barcode hinzufügen", "Add another barcode", "Aggiungi altro codice"),
                 "barcode_label": ("Barcode:", "Barcode:", "Codice a barre:"),
+                "article_number_label": ("Artikelnummer:", "Article number:", "Numero articolo:"),
                 "type_label": ("Typ:", "Type:", "Tipo:"),
                 "source_label": ("Quelle:", "Source:", "Fonte:"),
-                "manual_entry": ("Manuelle Eingabe", "Manual Entry", "Ingresso Manuale")
+                "manual_entry": ("Manuelle Eingabe", "Manual Entry", "Ingresso Manuale"),
+                "detected": ("Erkannt", "Detected", "Rilevato"),
+                "manual": ("Manuell", "Manual", "Manuale"),
+                "for_ean13": ("(EAN13 als Barcode)", "(EAN13 as barcode)", "(EAN13 come codice)"),
+                "for_other": ("(andere als Artikelnummer)", "(other as article number)", "(altro come numero articolo)")
             },
             "messagebox": {
                 "camera_error": ("Kamerafehler", "Camera Error", "Errore Fotocamera"),
@@ -1311,43 +1317,194 @@ class FullscreenApp(QMainWindow):
         logger.info("Anwendung wurde neu gestartet")
 
 
+    def add_new_barcode_field(self):
+        """Fügt ein neues leeres Barcode-Feld hinzu"""
+        logger.info("Füge neues Barcode-Feld hinzu")
+        
+        if not hasattr(self, 'all_barcodes'):
+            self.all_barcodes = []
+        
+        # Frage den Benutzer nach dem Typ (vereinfachte Version)
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Barcode-Typ auswählen")
+        dialog.setFixedSize(400, 200)
+        dialog.setStyleSheet("""
+            QDialog {
+                background: #2C3E50;
+            }
+            QLabel {
+                color: #ECF0F1;
+                font-size: 16px;
+            }
+            QPushButton {
+                font-size: 14px;
+                padding: 10px 20px;
+                background: #3498db;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                margin: 5px;
+            }
+            QPushButton:hover {
+                background: #2980b9;
+            }
+        """)
+        
+        layout = QVBoxLayout(dialog)
+        
+        label = QLabel("Welchen Typ von Barcode möchten Sie hinzufügen?")
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(label)
+        
+        btn_layout = QHBoxLayout()
+        
+        # Knopf für Artikelnummer (Interne Materialnummer)
+        btn_article = QPushButton("Interne Materialnummer")
+        btn_article.setMinimumHeight(50)
+        
+        # Knopf für EAN-Code
+        btn_ean = QPushButton("EAN-Code")
+        btn_ean.setMinimumHeight(50)
+        
+        btn_layout.addWidget(btn_article)
+        btn_layout.addWidget(btn_ean)
+        
+        layout.addLayout(btn_layout)
+        
+        # Neue Barcode-ID bestimmen
+        new_index = len(self.all_barcodes)
+        
+        def add_barcode(is_article: bool):
+            if is_article:
+                new_barcode = {
+                    "value": "", 
+                    "type": "CODE128", 
+                    "image_index": -1, 
+                    "cropped_image": None,
+                    "is_article_number": True,
+                    "source": "manual"
+                }
+            else:
+                new_barcode = {
+                    "value": "", 
+                    "type": "EAN13", 
+                    "image_index": -1, 
+                    "cropped_image": None,
+                    "is_article_number": False,
+                    "source": "manual"
+                }
+            
+            self.all_barcodes.append(new_barcode)
+            dialog.accept()
+            
+            # Seite neu laden, um das neue Feld anzuzeigen
+            self.load_pages()
+            
+            # Direkt zur Storage Page springen (Index 3)
+            if self.stack.count() > 3:
+                self.stack.setCurrentIndex(3)
+        
+        btn_article.clicked.connect(lambda: add_barcode(True))
+        btn_ean.clicked.connect(lambda: add_barcode(False))
+        
+        dialog.exec()
+
+    def find_barcode_widgets(self, widget: QWidget) -> List[Tuple[QWidget, int]]:
+        """Findet alle Barcode-Widgets und ihre Indizes"""
+        barcode_widgets = []
+        
+        # Prüfe ob dies ein Barcode-Widget ist
+        if isinstance(widget, QFrame) and widget.objectName().startswith("barcode_widget_"):
+            try:
+                # Extrahiere den Index aus dem objectName
+                index_str = widget.objectName().replace("barcode_widget_", "")
+                index = int(index_str)
+                barcode_widgets.append((widget, index))
+            except:
+                pass
+        
+        # Rekursiv Kinder durchsuchen
+        for child in widget.children():
+            if isinstance(child, QWidget):
+                barcode_widgets.extend(self.find_barcode_widgets(child))
+        
+        return barcode_widgets
+
     def get_storage_page_content(self) -> List[Any]:
-        """Erzeugt den dynamischen Inhalt für die Storage Pages basierend auf erkannten Barcodes"""
+        """Erzeugt den dynamischen Inhalt für die Storage Pages"""
         content = []
         
         # Übersetzungen laden
         no_barcodes_text = self.translator.get_text(self.language, "storage", "no_barcodes")
+        add_barcode_btn_text = self.translator.get_text(self.language, "storage", "add_barcode_btn")
+        
+        # Stelle sicher, dass all_barcodes existiert
+        if not hasattr(self, 'all_barcodes'):
+            self.all_barcodes = []
         
         # Füge Barcode-Einträge hinzu
-        if hasattr(self, 'all_barcodes') and self.all_barcodes:
-            self.barcode_input_widgets = []  # Liste für Widget-Referenzen
-            for i, barcode in enumerate(self.all_barcodes):
-                # Bearbeitbares Barcode-Widget erstellen
-                barcode_card = ("custom", self.create_editable_barcode_widget(barcode, i))
-                content.append([barcode_card])
-                # Widget-Referenz speichern
-                if hasattr(self, 'stack') and self.stack.count() > 3:
-                    page = self.stack.widget(3)
-                    scroll = page.findChild(QScrollArea)
-                    if scroll:
-                        content_widget = scroll.widget()
-                        # Letztes hinzugefügtes Widget finden
-                        last_layout_item = content_widget.layout().itemAt(content_widget.layout().count() - 1)
-                        if last_layout_item and last_layout_item.widget():
-                            frame = last_layout_item.widget()
-                            self.barcode_input_widgets.append(frame)
+        if self.all_barcodes:
+            self.barcode_input_widgets = []
+            
+            # Trenne EAN13 und Artikelnummern für bessere Darstellung
+            ean13_barcodes = [b for b in self.all_barcodes if not b.get('is_article_number', False)]
+            article_numbers = [b for b in self.all_barcodes if b.get('is_article_number', False)]
+            
+            # Zeige EAN13 Barcodes zuerst
+            if ean13_barcodes:
+                content.append(("text", f"EAN13 Barcodes ({len(ean13_barcodes)} erkannt):"))
+                for i, barcode in enumerate(ean13_barcodes):
+                    barcode_card = ("custom", self.create_editable_barcode_widget(barcode, i))
+                    content.append([barcode_card])
+            
+            # Zeige Artikelnummern
+            if article_numbers:
+                content.append(("text", f"Artikelnummern ({len(article_numbers)} erkannt):"))
+                start_idx = len(ean13_barcodes)
+                for j, article in enumerate(article_numbers):
+                    idx = start_idx + j
+                    article_card = ("custom", self.create_editable_barcode_widget(article, idx))
+                    content.append([article_card])
         else:
-            # Keine Barcodes gefunden - leeres Formular für manuelle Eingabe
-            empty_barcode = {"value": "", "type": "EAN13", "image_index": -1, "cropped_image": None}
-            barcode_card = ("custom", self.create_editable_barcode_widget(empty_barcode, 0))
+            # Keine Barcodes gefunden - Standardformular erstellen UND in all_barcodes speichern
             content.append([("text", no_barcodes_text)])
-            content.append([barcode_card])
+            
+            # Standard-EAN13 Feld erstellen und in all_barcodes speichern
+            empty_ean = {
+                "value": "", 
+                "type": "EAN13", 
+                "image_index": -1, 
+                "cropped_image": None,
+                "is_article_number": False,
+                "source": "manual"
+            }
+            self.all_barcodes.append(empty_ean)
+            ean_card = ("custom", self.create_editable_barcode_widget(empty_ean, 0))
+            content.append([ean_card])
+            
+            # Standard-Artikelnummer Feld erstellen und in all_barcodes speichern
+            empty_article = {
+                "value": "", 
+                "type": "CODE128",  # Standard für Artikelnummern
+                "image_index": -1, 
+                "cropped_image": None,
+                "is_article_number": True,
+                "source": "manual"
+            }
+            self.all_barcodes.append(empty_article)
+            article_card = ("custom", self.create_editable_barcode_widget(empty_article, 1))
+            content.append([article_card])
         
-        # Buttons am Ende (SAP-Eintrag, Lokal speichern) - übersetzt
+        # Button "Weiteren Barcode hinzufügen"
+        content.append([
+            ("button", add_barcode_btn_text, self.add_new_barcode_field)
+        ])
+        
+        # Buttons am Ende (SAP-Eintrag, Lokal speichern, Neu beginnen)
         content.append([
             ("button", self.translator.get_text(self.language, "storage", "sap_btn"), self.sap_integration_placeholder),
             ("button", self.translator.get_text(self.language, "storage", "save_btn"), self.save_all_data_csv),
-            ("button", self.translator.get_text(self.language, "storage", "rebeginn_btn"), self.rebeginn_application)
+            ("button", self.translator.get_text(self.language, "storage", "restart_btn"), self.rebeginn_application)
         ])
         
         return content
@@ -1355,13 +1512,41 @@ class FullscreenApp(QMainWindow):
     def create_editable_barcode_widget(self, barcode: Dict, index: int) -> QFrame:
         """Erstellt ein bearbeitbares Barcode-Widget mit Eingabefeldern"""
         frame = QFrame()
-        frame.setStyleSheet("""
-            QFrame {
-                background: #34495E;
-                border: 1px solid #5d6d7e;
-                border-radius: 12px;
-                padding: 20px;
-            }
+        frame.setObjectName(f"barcode_widget_{index}")
+        
+        # Bestimme ob Artikelnummer oder EAN13
+        is_article_number = barcode.get('is_article_number', False)
+        source = barcode.get('source', 'manual')
+        
+        # Größere Bildabmessungen
+        IMAGE_WIDTH = 500  # Statt 250
+        IMAGE_HEIGHT = 350  # Statt 150
+        
+        # Unterschiedliches Styling für Artikelnummer vs EAN13
+        if is_article_number:
+            frame_style = """
+                QFrame {
+                    background: #2C3E50;
+                    border: 2px solid #E67E22;
+                    border-radius: 12px;
+                    padding: 20px;
+                }
+            """
+            label_type = self.translator.get_text(self.language, "storage", "article_number_label")
+            type_hint = self.translator.get_text(self.language, "storage", "for_other")
+        else:
+            frame_style = """
+                QFrame {
+                    background: #34495E;
+                    border: 2px solid #3498db;
+                    border-radius: 12px;
+                    padding: 20px;
+                }
+            """
+            label_type = self.translator.get_text(self.language, "storage", "barcode_label")
+            type_hint = self.translator.get_text(self.language, "storage", "for_ean13")
+        
+        frame.setStyleSheet(frame_style + """
             QLabel {
                 color: #ECF0F1;
             }
@@ -1381,44 +1566,52 @@ class FullscreenApp(QMainWindow):
         layout = QHBoxLayout(frame)
         layout.setSpacing(20)
         
-        # Linke Seite: Barcode-Bild mit roter Umrandung
+        # Linke Seite: Barcode-Bild mit Farbcodierung
         image_container = QWidget()
         image_layout = QVBoxLayout(image_container)
         image_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
         # Übersetzte Text für die GUI
-        barcode_label_text = self.translator.get_text(self.language, "storage", "barcode_label")
         type_label_text = self.translator.get_text(self.language, "storage", "type_label")
         source_label_text = self.translator.get_text(self.language, "storage", "source_label")
         
         if "cropped_image" in barcode and barcode["cropped_image"] is not None:
             cropped_img = barcode["cropped_image"]
             
-            # Erstelle Bild mit roter Umrandung
-            if len(cropped_img.shape) == 3:
-                if cropped_img.shape[2] == 3:
-                    # BGR zu RGB für rote Umrandung
-                    bordered_img = cv2.copyMakeBorder(cropped_img, 5, 5, 5, 5, 
-                                                    cv2.BORDER_CONSTANT, value=(0, 0, 255))
-                    bordered_img = cv2.cvtColor(bordered_img, cv2.COLOR_BGR2RGB)
-                else:
-                    bordered_img = cropped_img
-            else:
-                # Graubild zu RGB
-                bordered_img = cv2.cvtColor(cropped_img, cv2.COLOR_GRAY2RGB)
-                bordered_img = cv2.copyMakeBorder(bordered_img, 5, 5, 5, 5,
-                                                cv2.BORDER_CONSTANT, value=(255, 0, 0))
+            # Farbige Umrandung basierend auf Typ
+            border_color = (255, 165, 0) if is_article_number else (0, 255, 0)  # Orange für Artikel, Grün für EAN
             
-            pixmap = self.convert_to_pixmap(bordered_img, width=250, height=150)
+            if len(cropped_img.shape) == 3:
+                bordered_img = cv2.copyMakeBorder(cropped_img, 8, 8, 8, 8, 
+                                                cv2.BORDER_CONSTANT, value=border_color)
+                if cropped_img.shape[2] == 3:
+                    bordered_img = cv2.cvtColor(bordered_img, cv2.COLOR_BGR2RGB)
+            else:
+                bordered_img = cv2.cvtColor(cropped_img, cv2.COLOR_GRAY2RGB)
+                bordered_img = cv2.copyMakeBorder(bordered_img, 8, 8, 8, 8,
+                                                cv2.BORDER_CONSTANT, value=border_color)
+            
+            # VERGRÖSSERT: Neue Bildgröße
+            pixmap = self.convert_to_pixmap(bordered_img, width=IMAGE_WIDTH, height=IMAGE_HEIGHT)
             image_label = QLabel()
             image_label.setPixmap(pixmap)
             image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            
+            # Klick-Event für Vergrößerung hinzufügen
+            image_label.mousePressEvent = lambda event, img=cropped_img, barcode_type=("Artikelnummer" if is_article_number else "EAN"): self.show_enlarged_image(img, barcode_type)
+            image_label.setCursor(Qt.CursorShape.PointingHandCursor)
+            image_label.setToolTip("Klicken zum Vergrößern")
+            
             image_layout.addWidget(image_label)
             
             # Bildquelle
             image_names = ["ISO Bild", "Top Bild", "Right Bild", "Behind Bild"]
             img_idx = barcode.get('image_index', 0)
-            source_text = f"{source_label_text} {image_names[img_idx] if img_idx < len(image_names) else f'Bild {img_idx}'}"
+            if img_idx >= 0 and img_idx < len(image_names):
+                source_text = f"{source_label_text} {image_names[img_idx]}"
+            else:
+                source_text = f"{source_label_text} {self.translator.get_text(self.language, 'storage', 'manual')}"
+            
             source_label = QLabel(source_text)
             source_label.setStyleSheet("font-size: 12px; color: #BDC3C7; margin-top: 8px;")
             source_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1431,68 +1624,111 @@ class FullscreenApp(QMainWindow):
                 font-size: 14px;
             """)
             placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            placeholder.setFixedSize(250, 150)
+            placeholder.setFixedSize(IMAGE_WIDTH, IMAGE_HEIGHT)  # Auch Platzhalter vergrößern
             image_layout.addWidget(placeholder)
             
-            # Quelle für manuelle Eingabe
-            source_label = QLabel(f"{source_label_text} Manuelle Eingabe")
+            source_label = QLabel(f"{source_label_text} {self.translator.get_text(self.language, 'storage', 'manual')}")
             source_label.setStyleSheet("font-size: 12px; color: #BDC3C7; margin-top: 8px;")
             source_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             image_layout.addWidget(source_label)
-        
         layout.addWidget(image_container)
         
-        # Rechte Seite: Bearbeitbare Barcode-Informationen
+        # Rechte Seite: Bearbeitbare Informationen
         info_container = QWidget()
         info_layout = QVBoxLayout(info_container)
         info_layout.setSpacing(15)
         
-        # Barcode-Wert Eingabefeld
-        barcode_value_label = QLabel(barcode_label_text)
-        barcode_value_label.setStyleSheet("font-size: 16px; font-weight: bold;")
-        info_layout.addWidget(barcode_value_label)
+        # Typ-Anzeige (Artikelnummer oder Barcode) mit Hinweis
+        type_header = QLabel(f"{label_type} {type_hint}")
+        type_header.setStyleSheet("font-size: 16px; font-weight: bold; color: #F39C12;" if is_article_number else "font-size: 16px; font-weight: bold; color: #3498db;")
+        info_layout.addWidget(type_header)
         
+        # Eingabefeld für Wert
         barcode_input = QLineEdit()
         barcode_input.setText(barcode.get('value', ''))
-        barcode_input.setPlaceholderText("Barcode hier eingeben...")
+        
+        if is_article_number:
+            barcode_input.setPlaceholderText("Artikelnummer hier eingeben...")
+        else:
+            barcode_input.setPlaceholderText("EAN13 Barcode hier eingeben...")
+        
         barcode_input.textChanged.connect(lambda text: self.update_barcode_value(index, text))
         info_layout.addWidget(barcode_input)
         
         # Barcode-Typ Auswahl
-        type_label = QLabel(type_label_text)
-        type_label.setStyleSheet("font-size: 16px; font-weight: bold; margin-top: 10px;")
-        info_layout.addWidget(type_label)
+        type_sublabel = QLabel(type_label_text)
+        type_sublabel.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 10px;")
+        info_layout.addWidget(type_sublabel)
         
         type_combo = QComboBox()
-        barcode_types = ["EAN13", "EAN8", "UPC-A", "UPC-E", "CODE128", "CODE39", "ITF", "QR"]
-        type_combo.addItems(barcode_types)
         
-        # Aktuellen Typ setzen, falls vorhanden
-        current_type = barcode.get('type', 'EAN13')
-        if current_type in barcode_types:
-            type_combo.setCurrentText(current_type)
-        type_combo.currentTextChanged.connect(lambda text: self.update_barcode_type(index, text))
+        type_combo.wheelEvent = lambda event: None  # Ignoriere alle Wheel-Events
+
+        # Barcode-Typen mit Trennung
+        type_combo.addItem("EAN13 - Produkt-Barcode")
+        type_combo.addItem("EAN8")
+        type_combo.addItem("UPC-A")
+        type_combo.addItem("UPC-E")
+        type_combo.addItem("CODE128 - Artikelnummer")
+        type_combo.addItem("CODE39 - Artikelnummer")
+        type_combo.addItem("ITF - Artikelnummer")
+        type_combo.addItem("QR - Artikelnummer")
+        type_combo.addItem("Andere - Artikelnummer")
+        
+        # Aktuellen Typ setzen
+        current_type = barcode.get('type', 'CODE128' if is_article_number else 'EAN13')
+        
+        # Mapping für die Anzeige
+        type_mapping = {
+            'EAN13': "EAN13 - Produkt-Barcode",
+            'EAN8': "EAN8",
+            'UPC-A': "UPC-A",
+            'UPC-E': "UPC-E",
+            'CODE128': "CODE128 - Artikelnummer",
+            'CODE39': "CODE39 - Artikelnummer",
+            'ITF': "ITF - Artikelnummer",
+            'QR': "QR - Artikelnummer"
+        }
+        
+        display_type = type_mapping.get(current_type, "Andere - Artikelnummer")
+        type_combo.setCurrentText(display_type)
+        
+        # Bei Typänderung: is_article_number aktualisieren
+        type_combo.currentTextChanged.connect(lambda text: self.update_barcode_type_and_status(index, text))
         info_layout.addWidget(type_combo)
         
-        # Status-Anzeige (erkannt/nicht erkannt)
+        # Status-Anzeige
         status_label = QLabel()
         if barcode.get('value'):
-            status_label.setText("Barcode erkannt")
-            status_label.setStyleSheet("color: #2ecc71; font-weight: bold; margin-top: 10px;")
+            if is_article_number:
+                status_text = f"Artikelnummer {self.translator.get_text(self.language, 'storage', source)}"
+                status_color = "#E67E22"  # Orange
+            else:
+                status_text = f"EAN13 Barcode {self.translator.get_text(self.language, 'storage', source)}"
+                status_color = "#2ecc71"  # Grün
         else:
-            status_label.setText("Kein Barcode erkannt - Bitte manuell eingeben")
-            status_label.setStyleSheet("color: #e74c3c; font-weight: bold; margin-top: 10px;")
+            if is_article_number:
+                status_text = "Artikelnummer bitte manuell eingeben"
+                status_color = "#e74c3c"  # Rot
+            else:
+                status_text = "EAN13 Barcode bitte manuell eingeben"
+                status_color = "#e74c3c"  # Rot
+        
+        status_label.setText(status_text)
+        status_label.setStyleSheet(f"color: {status_color}; font-weight: bold; margin-top: 10px;")
         info_layout.addWidget(status_label)
         
         info_layout.addStretch()
         layout.addWidget(info_container, stretch=1)
         
-        # Referenzen für späteren Zugriff speichern
+        # Referenzen speichern
         frame.barcode_input = barcode_input
         frame.type_combo = type_combo
         frame.status_label = status_label
+        frame.is_article_number = is_article_number
         
         return frame
+
 
     def update_barcode_value(self, index: int, value: str):
         """Aktualisiert den Barcode-Wert"""
@@ -1509,45 +1745,48 @@ class FullscreenApp(QMainWindow):
                     frame.status_label.setText("Kein Barcode erkannt - Bitte manuell eingeben")
                     frame.status_label.setStyleSheet("color: #e74c3c; font-weight: bold; margin-top: 10px;")
 
-    def update_barcode_type(self, index: int, barcode_type: str):
-        """Aktualisiert den Barcode-Typ"""
-        if index < len(self.all_barcodes):
-            self.all_barcodes[index]['type'] = barcode_type
+    def update_barcode_type_and_status(self, index: int, display_type: str):
+        """Aktualisiert Barcode-Typ und is_article_number Flag"""
+        if index >= len(self.all_barcodes):
+            return
+        
+        # Extrahiere den reinen Typ aus der Anzeige
+        if " - " in display_type:
+            barcode_type = display_type.split(" - ")[0]
+        else:
+            barcode_type = display_type
+        
+        # Bestimme ob Artikelnummer (alles außer EAN13)
+        is_article_number = (barcode_type != "EAN13")
+        
+        # Update in der Datenstruktur
+        self.all_barcodes[index]['type'] = barcode_type
+        self.all_barcodes[index]['is_article_number'] = is_article_number
+        
+        logger.info(f"Barcode {index}: Typ auf {barcode_type} gesetzt, Artikelnummer={is_article_number}")
+        
+        # GUI aktualisieren (Seite neu laden für Farbänderung)
+        self.load_pages()
+        if self.stack.count() > 3:
+            self.stack.setCurrentIndex(3)
 
     def save_all_data_csv(self):
-        """Speichert alle Daten in CSV gemäß der Tabelle"""
+        """Speichert alle Daten in CSV mit Trennung von EAN und Artikelnummern"""
         try:
             # Ordner für Bilder erstellen
             scan_folder = f"Scan_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
             os.makedirs(scan_folder, exist_ok=True)
             
-            # ISO-Bild speichern (erste Kamera)
+            # ISO-Bild speichern
             iso_bild_pfad = ""
             if self.images and len(self.images) > 0 and self.images[0] is not None:
                 iso_bild_datei = "iso_bild.jpg"
                 iso_bild_pfad = os.path.join(scan_folder, iso_bild_datei)
-                
-                # Konvertiere RGB zu BGR für OpenCV
                 if len(self.images[0].shape) == 3 and self.images[0].shape[2] == 3:
                     bgr_img = cv2.cvtColor(self.images[0], cv2.COLOR_RGB2BGR)
                 else:
                     bgr_img = self.images[0]
-                
                 cv2.imwrite(iso_bild_pfad, bgr_img)
-            
-            # Andere Bilder auch speichern (optional)
-            bild_namen = ["top_bild", "right_bild", "behind_bild"]
-            for i in range(1, min(len(self.images), 4)):
-                if self.images[i] is not None:
-                    bild_datei = f"{bild_namen[i-1]}.jpg"
-                    bild_pfad = os.path.join(scan_folder, bild_datei)
-                    
-                    if len(self.images[i].shape) == 3 and self.images[i].shape[2] == 3:
-                        bgr_img = cv2.cvtColor(self.images[i], cv2.COLOR_RGB2BGR)
-                    else:
-                        bgr_img = self.images[i]
-                    
-                    cv2.imwrite(bild_pfad, bgr_img)
             
             # CSV-Datei erstellen
             csv_datei = os.path.join(scan_folder, "scanner_daten.csv")
@@ -1555,7 +1794,7 @@ class FullscreenApp(QMainWindow):
             with open(csv_datei, 'w', newline='', encoding='utf-8') as csvfile:
                 writer = csv.writer(csvfile, delimiter=';')
                 
-                # Kopfzeile
+                # NEUE Kopfzeile mit separaten Spalten für EAN und Artikelnummer
                 writer.writerow([
                     "Interne_Materialnummer",
                     "Gewicht [kg]",
@@ -1587,48 +1826,51 @@ class FullscreenApp(QMainWindow):
                     except:
                         pass
                 
-                # Für jeden Barcode eine Zeile erstellen (nur EAN/UPC)
-                ean_barcodes = []
-                for barcode in self.all_barcodes:
-                    barcode_type = barcode.get("type", "").upper()
-                    if barcode_type in ["EAN13", "EAN8", "UPC-A", "UPC-E", "EAN", "UPC"]:
-                        ean_barcodes.append(barcode)
+                # Trenne EAN13 und Artikelnummern
+                ean_codes = []
+                article_numbers = []
                 
-                if ean_barcodes:
-                    for barcode in ean_barcodes:
-                        writer.writerow([
-                            "",  # Interne_Materialnummer (leer)
-                            f"{gewicht:.3f}".replace(".", ","),  # Gewicht mit Komma
-                            f"{laenge:.0f}".replace(".", ","),  # Länge ohne Dezimalstellen
-                            f"{breite:.0f}".replace(".", ","),  # Breite ohne Dezimalstellen
-                            f"{hoehe:.0f}".replace(".", ","),  # Höhe ohne Dezimalstellen
-                            barcode.get("value", ""),  # EAN-Code
-                            iso_bild_pfad if iso_bild_pfad else ""  # Pfad zum Bild
-                        ])
-                else:
-                    # Eine Zeile ohne Barcode
+                if hasattr(self, 'all_barcodes'):
+                    for barcode in self.all_barcodes:
+                        value = barcode.get('value', '').strip()
+                        if not value:
+                            continue
+                        
+                        if barcode.get('is_article_number', False):
+                            article_numbers.append(value)
+                        else:
+                            ean_codes.append(value)
+                
+                # Für jede Kombination eine Zeile erstellen
+                # Wenn keine Barcodes, eine leere Zeile
+                if not ean_codes and not article_numbers:
                     writer.writerow([
                         "",  # Interne_Materialnummer
                         f"{gewicht:.3f}".replace(".", ","),
                         f"{laenge:.0f}".replace(".", ","),
                         f"{breite:.0f}".replace(".", ","),
                         f"{hoehe:.0f}".replace(".", ","),
-                        "",  # Kein EAN-Code
+                        "",  # EAN-Code
                         iso_bild_pfad if iso_bild_pfad else ""
                     ])
-            
+                else:
+                    # Kombiniere alle Möglichkeiten
+                    for ean in (ean_codes if ean_codes else [""]):
+                        for article in (article_numbers if article_numbers else [""]):
+                            writer.writerow([
+                                article,
+                                f"{gewicht:.3f}".replace(".", ","),
+                                f"{laenge:.0f}".replace(".", ","),
+                                f"{breite:.0f}".replace(".", ","),
+                                f"{hoehe:.0f}".replace(".", ","),
+                                ean,
+                                iso_bild_pfad if iso_bild_pfad else ""
+                            ])
+                
             # Erfolgsmeldung
-            QMessageBox.information(
-                self,
-                "CSV erstellt",
-                f"Alle Daten wurden gespeichert:\n"
-                f"Ordner: {scan_folder}\n"
-                f"CSV: scanner_daten.csv\n"
-                f"Bilder: iso_bild.jpg, top_bild.jpg, right_bild.jpg, behind_bild.jpg\n\n"
-                f"EAN-Codes: {len(ean_barcodes)}"
-            )
+            QMessageBox.information(self, "CSV erstellt", f"Daten gespeichert in: {scan_folder}\n\n")
             
-            logger.info(f"Daten gespeichert in: {scan_folder}")
+            logger.info(f"Daten gespeichert: {len(ean_codes)} EANs, {len(article_numbers)} Artikelnummern")
             
         except Exception as e:
             QMessageBox.critical(
@@ -1637,9 +1879,6 @@ class FullscreenApp(QMainWindow):
                 f"Fehler beim Speichern:\n{str(e)}"
             )
             logger.error(f"Fehler in save_all_data_csv: {e}")
-
-
-
 
 
     def go_back(self):
