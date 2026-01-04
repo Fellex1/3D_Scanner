@@ -1,46 +1,31 @@
+#Interface_v08.py
 """=======TODO-Liste v0.8=======
-Objekt-Detection muss verbessert werden
-Lade-Dialog schöner gestalten
-Fehlerbehandlung bei Kamerazugriff
+Objekt-Detection muss verbessert werden/Mit Bemassung der Distanz von der LIDAR-Kamera      !!!!!!!!!
+Gewicht-Messung muss implementiert werden                                                   !!!!!!!!!
 SAP-Integration                 (Platzhalter-Button/optional)
-Lokal speichern Integration     (Platzhalter-Button)
-GUI-Design verbessern           (optional)
+Lokal speichern Integration     (Formatierung?)
+
 ================================"""
 
+import os
+import csv
 import sys
 import cv2
-import os
-import numpy as np
-import threading
+import json
 import logging
 import platform
-from typing import List, Tuple, Dict, Optional, Any, Union
+import numpy as np
+from datetime import datetime 
 from dataclasses import dataclass
-import json
+from typing import List, Tuple, Dict, Optional, Any
 
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit,
     QPushButton, QLabel, QFrame, QSizePolicy, QStackedWidget, QScrollArea, 
-    QToolButton, QMessageBox, QDialog, QGridLayout, QProgressBar
+    QToolButton, QMessageBox, QDialog, QProgressBar, QComboBox
 )
 from PyQt6.QtGui import QPixmap, QIcon, QKeySequence, QShortcut, QMovie, QImage
-from PyQt6.QtCore import Qt, QSize, QThread, pyqtSignal, QObject, QRunnable, QThreadPool
-
-
-def resource_path(relative_path):
-    """Get absolute path to resource, works for dev and for PyInstaller"""
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-    
-    return os.path.join(base_path, relative_path)
-
-# Ändere dann alle Pfade in deinem Code:
-# Beispiel: Statt "GUI_Anzeige/logo.png" -> resource_path("GUI_Anzeige/logo.png")
-
-
+from PyQt6.QtCore import Qt, QSize, QThread, pyqtSignal
 
 # ==================== Konfiguration ====================
 @dataclass
@@ -51,9 +36,9 @@ class AppConfig:
     IMAGE_HEIGHT: int = 480
     DEBUG_SINGLE_CAMERA: bool = True
     DEFAULT_LANGUAGE: str = "de"
-    GUI_RESOURCES_PATH: str = resource_path("GUI_Anzeige")
+    GUI_RESOURCES_PATH: str = "GUI_Anzeige"
     LOG_LEVEL: str = "INFO"
-    YOLO_MODEL_PATH: str = resource_path("YOLOYOLOV8s_Barcode_Detection.pt")
+    YOLO_MODEL_PATH: str = "models/YOLOV8s_Barcode_Detection.pt"
     
     @classmethod
     def load_from_file(cls, config_path: str = "config.json"):
@@ -93,7 +78,7 @@ class TranslationManager:
         # Struktur: (Deutsch, Englisch, Italienisch)
         self.translations = {
             "start": {
-                "title": ("3D-Scanner Interface", "3D Scanner Interface", "Interfaccia Scanner 3D"),
+                "title": ("3D Scanner Interface", "3D Scanner Interface", "3D Scanner Interfaccia"),
                 "subtitle": ("Interface um den 3D-Scanner zu bedienen", "Interface to operate the 3D scanner", "Interfaccia per gestire lo scanner 3D"),
                 "instruction1": ("Bitte lege den Artikel der gescannt werden soll in die Box ein", "Please place the item to be scanned in the box", "Si prega di posizionare l'articolo nella scatola"),
                 "instruction2": ("Stellen Sie sicher, dass der Artikel vollständig im Sichtfeld aller Kameras liegt", "Make sure the item is completely in the field of view of all cameras", "Assicurarsi che l'articolo sia completamente nel campo visivo di tutte le telecamere"),
@@ -133,10 +118,44 @@ class TranslationManager:
             },
             "storage": {
                 "title": ("Speicher Option", "Storage Options", "Opzioni di Memorizzazione"),
-                "barcode_label": ("Ausgewerteter Barcode:", "Barcode:", "Barcode:"),
-                "barcode_type": ("Barcode-Typ:", "Barcode Type:", "Tipo di barcode:"),
+                "no_barcodes": ("Keine Barcodes erkannt", "No barcodes detected", "Nessun codice a barre rilevato"),
                 "sap_btn": ("SAP-Eintrag", "SAP Entry", "SAP Entry"),
-                "save_btn": ("Lokal speichern", "Save Locally", "Salva localmente")
+                "save_btn": ("Lokal speichern", "Save Locally", "Salva localmente"),
+                "restart_btn": ("Neu Beginnen", "Restart", "Riavvia"),
+                "add_barcode_btn": ("Weiteren Barcode hinzufügen", "Add another barcode", "Aggiungi altro codice"),
+                "barcode_label": ("Barcode:", "Barcode:", "Codice a barre:"),
+                "article_number_label": ("Artikelnummer:", "Article number:", "Numero articolo:"),
+                "type_label": ("Typ:", "Type:", "Tipo:"),
+                "source_label": ("Quelle:", "Source:", "Fonte:"),
+                "manual_entry": ("Manuelle Eingabe", "Manual Entry", "Ingresso Manuale"),
+                "detected": ("Erkannt", "Detected", "Rilevato"),
+                "manual": ("Manuell", "Manual", "Manuale"),
+                "for_ean13": ("(EAN13 als Barcode)", "(EAN13 as barcode)", "(EAN13 come codice)"),
+                "for_other": ("(andere als Artikelnummer)", "(other as article number)", "(altro come numero articolo)")
+            },
+            "messagebox": {
+                "camera_error": ("Kamerafehler", "Camera Error", "Errore Fotocamera"),
+                "measurement_error": ("Messfehler", "Measurement Error", "Errore di Misura"),
+                "storage_error": ("Speicherfehler", "Storage Error", "Errore di Memoria"),
+                "data_loss_confirm": ("Datenverlust bestätigen", "Confirm Data Loss", "Conferma Perdita Dati"),
+                "data_loss_message": ("Möchten Sie wirklich zurück zur Startseite? Alle erfassten Daten gehen verloren.", "Do you really want to go back to the start page? All captured data will be lost.", "Vuoi davvero tornare alla pagina iniziale? Tutti i dati acquisiti saranno persi."),
+                "cancel_confirm": ("Abbrechen", "Cancel", "Annulla"),
+                "scan_aborted_title": ("Scan abgebrochen", "Scan Aborted", "Scansione Annullata"),
+                "scan_aborted_message": ("Der Scan wurde abgebrochen.", "The scan has been aborted.", "La scansione è stata annullata."),
+                "scan_completed_title": ("Scan abgeschlossen", "Scan Completed", "Scansione Completata"),
+                "scan_completed_message": ("Der Scan war erfolgreich!\nDie Daten stehen nun zur Verfügung.", "The scan was successful!\nThe data is now available.", "La scansione è stata completata con successo!\nI dati sono ora disponibili."),
+                "no_images_title": ("Keine Bilder", "No Images", "Nessuna Immagine"),
+                "no_images_message": ("Bitte nehmen Sie zuerst Bilder auf, bevor Sie fortfahren.", "Please take pictures first before continuing.", "Per favore scatta prima le foto prima di continuare."),
+                "no_barcodes_title": ("Keine Barcodes", "No Barcodes", "Nessun Codice a Barre"),
+                "no_barcodes_message": ("Es wurden keine Barcodes zum Speichern gefunden.", "No barcodes were found to save.", "Non è stato trovato alcun codice a barre da salvare."),
+                "save_error_title": ("Speicherfehler", "Save Error", "Errore di Salvataggio"),
+                "save_error_message": ("Fehler beim Speichern der Daten.", "Error saving data.", "Errore durante il salvataggio dei dati."),
+                "save_success_title": ("Erfolgreich gespeichert", "Save Successful", "Salvataggio Riuscito"),
+                "save_success_message": ("{count} Barcode(s) wurden lokal gespeichert.", "{count} barcode(s) have been saved locally.", "{count} codice(i) a barre sono stati salvati localmente."),
+                "sap_integration_title": ("SAP-Integration", "SAP Integration", "Integrazione SAP"),
+                "sap_integration_message": ("SAP-Integration würde jetzt gestartet werden...", "SAP Integration would now be started...", "L'integrazione SAP verrà ora avviata..."),
+                "save_local_title": ("Lokales Speichern", "Local Save", "Salvataggio Locale"),
+                "save_local_message": ("Daten würden jetzt lokal gespeichert werden...", "Data would now be saved locally...", "I dati verrebbero ora salvati localmente...")
             }
         }
         
@@ -262,13 +281,14 @@ class CameraManager:
 class DetectionManager:
     def __init__(self):
         self.yolo_model = None
-        self.barcode_model = None
+        self.barcode_detector = None  # Wird später initialisiert
+        self.all_barcodes: List[Dict[str, Any]] = []
         
     def load_yolo_model(self, model_path: str = CONFIG.YOLO_MODEL_PATH):
         """Lädt das YOLO-Modell (einmalig)"""
         try:
             from ultralytics import YOLO
-            self.barcode_model = YOLO(model_path)
+            self.yolo_model = YOLO(model_path)
             logger.info(f"YOLO-Modell geladen von {model_path}")
         except ImportError as e:
             logger.error(f"YOLO nicht verfügbar: {e}")
@@ -283,7 +303,7 @@ class DetectionManager:
         # Direkt importieren und verwenden
         try:
             # Importiere das Modul neu
-            import BoundingBox_Yolo03 as yolo_module
+            import workers.BoundingBox_Yolo03 as yolo_module
             logger.info("BoundingBox_Yolo03 erfolgreich importiert")
         except ImportError as e:
             logger.error(f"YOLO-Modul nicht gefunden: {e}")
@@ -350,60 +370,60 @@ class DetectionManager:
         logger.info(f"YOLO-Erkennung abgeschlossen. Dimensionen: {all_dimensions}")
         return all_dimensions, all_frames
     
+
     def run_barcode_detection(self, images: List[np.ndarray]) -> List[Dict[str, Any]]:
-        """Erkennt Barcodes in den Bildern"""
-        results: List[Dict[str, Any]] = []
-        
+        """Erkennt alle Barcodes in den Bildern"""
         try:
-            from BarCode_v02 import process_roi
-        except ImportError as e:
-            logger.error(f"Barcode-Modul nicht gefunden: {e}")
-            for idx in range(len(images)):
-                results.append({"index": idx, "found": False, "error": "Modul nicht verfügbar"})
-            return results
-        
-        if self.barcode_model is None:
-            self.load_yolo_model()
-        
-        for idx, img in enumerate(images):
-            if img is None:
-                results.append({"index": idx, "found": False})
-                continue
-
-            try:
-                found = False
-                decoded_value = None
-                decoded_type = None
-
-                if self.barcode_model:
-                    model_results = self.barcode_model.predict(img)
-
-                    for r in model_results:
-                        for box in r.boxes.xyxy:
-                            x1, y1, x2, y2 = map(int, box)
-                            roi = img[y1:y2, x1:x2]
-                            result = process_roi(roi, f"image_{idx}")
-                            if result["found"]:
-                                found = True
-                                decoded_value = result["value"]
-                                decoded_type = result["type"]
-                                break
-
-                        if found:
-                            break
-
-                results.append({
-                    "index": idx,
-                    "found": found,
-                    "value": decoded_value,
-                    "type": decoded_type
-                })
+            # Importiere die BarcodeDetector Klasse
+            from workers.BarCode_v02 import BarcodeDetector
+            
+            # Initialisiere Detector
+            detector = BarcodeDetector()
+            self.all_barcodes = []
+            
+            image_names = ["iso_Bild", "top_Bild", "right_Bild", "behind_Bild"]
+            
+            for idx, img in enumerate(images):
+                if img is None:
+                    logger.warning(f"Bild {idx} ist None - überspringe")
+                    continue
                 
-            except Exception as e:
-                logger.error(f"Fehler bei Barcode-Erkennung Bild {idx}: {e}")
-                results.append({"index": idx, "found": False, "error": str(e)})
-        
-        return results
+                img_name = image_names[idx] if idx < len(image_names) else f"Bild_{idx}"
+                logger.info(f"Analysiere Bild {idx} ({img_name}) auf Barcodes...")
+                
+                try:
+                    # Erkenne Barcodes in diesem Bild
+                    barcodes_in_image = detector.detect_barcodes_in_image(img, idx, img_name)
+                    
+                    if barcodes_in_image:
+                        logger.info(f"Bild {idx}: {len(barcodes_in_image)} Barcode(s) erkannt")
+                        self.all_barcodes.extend(barcodes_in_image)
+                    else:
+                        logger.info(f"Bild {idx}: Keine Barcodes erkannt")
+                        
+                except Exception as e:
+                    logger.error(f"Fehler bei Barcode-Erkennung Bild {idx}: {e}")
+            
+            logger.info(f"Insgesamt {len(self.all_barcodes)} Barcodes in {len(images)} Bildern erkannt")
+            
+            # Konvertiere zu einfachem Format für die GUI
+            simple_barcodes = []
+            for barcode in self.all_barcodes:
+                simple_barcodes.append({
+                    "found": True,
+                    "value": barcode.get("value"),
+                    "type": barcode.get("type"),
+                    "image_index": barcode.get("image_index", 0),
+                    "cropped_image": barcode.get("cropped_image")
+                })
+            
+            return simple_barcodes
+            
+        except Exception as e:
+            logger.error(f"Fehler in run_barcode_detection: {e}")
+            return []
+
+
 
 # ==================== Parallel Worker ====================
 class ParallelWorker(QThread):   
@@ -473,8 +493,8 @@ class ParallelWorker(QThread):
     def _run_weight_task(self):
         """Führt Gewichtsmessung durch"""
         try:
-            import Gewichts_Messung
-            weight = Gewichts_Messung.get_weight()
+            import workers.Gewichts_Messung
+            weight = workers.Gewichts_Messung.get_weight()
             return {"weight": weight}
         except ImportError as e:
             logger.error(f"Gewichtsmodul nicht verfügbar: {e}")
@@ -633,6 +653,7 @@ class FullscreenApp(QMainWindow):
         """)
         btn.clicked.connect(lambda _, lang=language_code: self.set_language(lang))
         return btn
+
 
     def create_start_page(self) -> QWidget:
         """Erstellt die Startseite"""
@@ -924,6 +945,14 @@ class FullscreenApp(QMainWindow):
             button.clicked.connect(callback)
         return button
 
+    def sap_integration_placeholder(self):
+        """Platzhalter für SAP-Integration"""
+        QMessageBox.information(self, 
+                                self.translator.get_text(self.language, "start", "sap_integration_title"), 
+                                self.translator.get_text(self.language, "start", "sap_integration_message"))
+
+        logger.info("SAP-Integration Button gedrückt")
+        
     def convert_to_pixmap(self, frame: np.ndarray, width: int = 300, height: int = 300) -> QPixmap:
         """Konvertiert OpenCV-Bild zu QPixmap"""
         if frame is None or (isinstance(frame, np.ndarray) and np.all(frame == 0)):
@@ -1026,18 +1055,39 @@ class FullscreenApp(QMainWindow):
             return self.make_card(str(item))
         
         widget_type = item[0]
+        
+        if widget_type == "custom":
+            # Custom-Widget direkt zurückgeben
+            return item[1]
+        
         widget_creators = {
             "button": self._create_button_widget,
             "image": self._create_image_widget, 
             "ram_image": self._create_ram_image_widget,
             "ram_image_final": self._create_ram_image_final_widget,
             "title": self._create_title_widget,
-            "input": self._create_input_widget
+            "input": self._create_input_widget,
+            "text": self._create_text_widget
         }
         creator = widget_creators.get(widget_type)
         if creator:
             return creator(*item[1:])
         return self.make_card(str(item))
+
+    def _create_text_widget(self, text: str) -> QLabel:
+        """Erstellt einen Text-Widget"""
+        label = QLabel(text)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        label.setStyleSheet("""
+            QLabel {
+                color: #BDC3C7;
+                font-size: 18px;
+                font-style: italic;
+                padding: 30px;
+            }
+        """)
+        label.setWordWrap(True)
+        return label
 
     def _create_button_widget(self, text: str, callback=None) -> QPushButton:
         """Erstellt einen Button"""
@@ -1177,16 +1227,15 @@ class FullscreenApp(QMainWindow):
 
     def load_pages(self):
         """Lädt alle Seiten neu, behält aber die aktuelle Seite bei"""
-        # Speichere aktuelle Seite
         current_page = self.stack.currentIndex() if hasattr(self, 'stack') else 0
         
-        if self.abmessung is None:
+        # Setze Standardwerte wenn nicht vorhanden
+        if not hasattr(self, 'abmessung') or self.abmessung is None:
             self.abmessung = "Undefiniert"
-        if self.gewicht is None:
+        if not hasattr(self, 'gewicht') or self.gewicht is None:
             self.gewicht = "Undefiniert"
-        if self.barcode is None:
-            self.barcode = "Undefiniert"
-            self.barcode_type = "Undefiniert"
+        if not hasattr(self, 'all_barcodes'):
+            self.all_barcodes = []
         
         # Alte Seiten entfernen
         while self.stack.count() > 0:
@@ -1194,7 +1243,7 @@ class FullscreenApp(QMainWindow):
             self.stack.removeWidget(widget)
             widget.deleteLater()
 
-        # Startseite mit speziellem Layout
+        # Startseite
         start_page = self.create_start_page()
         self.stack.addWidget(start_page)
 
@@ -1226,17 +1275,11 @@ class FullscreenApp(QMainWindow):
             },
             "storage": {
                 "title_key": "storage",
-                "content": [
-                    ("image", "barcode"),
-                    ("input", self.translator.get_text(self.language, "storage", "barcode_label"), f"{self.barcode}"),
-                    ("input", self.translator.get_text(self.language, "storage", "barcode_type"), f"{self.barcode_type}"),
-                    [("button", self.translator.get_text(self.language, "storage", "sap_btn")),
-                    ("button", self.translator.get_text(self.language, "storage", "save_btn"))]
-                ]
+                "content": self.get_storage_page_content()
             }
         }
         
-        # Seiten hinzufügen
+        # Füge alle Seiten hinzu
         for page_key in ["photo", "overview", "storage"]:
             config = page_configs[page_key]
             self.add_page(
@@ -1244,14 +1287,599 @@ class FullscreenApp(QMainWindow):
                 config["content"]
             )
         
-        # Zurück zur ursprünglichen Seite springen (maximale Seitenzahl beachten)
+        # Zurück zur ursprünglichen Seite springen
         max_pages = self.stack.count()
         if current_page >= max_pages:
             current_page = max_pages - 1
         
         self.stack.setCurrentIndex(current_page)
         self.update_buttons()
+
+    def rebeginn_application(self):
+        """Startet die Anwendung von der Startseite neu"""
+        if QMessageBox.question(self, self.translator.get_text(self.language, "messagebox", "data_loss_confirm"), 
+                                          self.translator.get_text(self.language, "messagebox", "data_loss_message"),
+                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel) == QMessageBox.StandardButton.Cancel:
+            return
         
+        self.abmessung = None
+        self.gewicht = None
+        self.barcode = None
+        self.barcode_type = None
+        self.images = [None] * CONFIG.NUM_CAMERAS
+        self.final_images = [None] * CONFIG.NUM_CAMERAS
+        self.keep = [True] * CONFIG.NUM_CAMERAS
+        self.scan_start = False
+        self.all_barcodes = []
+        self.load_pages()
+        self.stack.setCurrentIndex(0)
+        self.update_buttons()
+        logger.info("Anwendung wurde neu gestartet")
+
+
+    def add_new_barcode_field(self):
+        """Fügt ein neues leeres Barcode-Feld hinzu"""
+        logger.info("Füge neues Barcode-Feld hinzu")
+        
+        if not hasattr(self, 'all_barcodes'):
+            self.all_barcodes = []
+        
+        # Frage den Benutzer nach dem Typ (vereinfachte Version)
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Barcode-Typ auswählen")
+        dialog.setFixedSize(400, 200)
+        dialog.setStyleSheet("""
+            QDialog {
+                background: #2C3E50;
+            }
+            QLabel {
+                color: #ECF0F1;
+                font-size: 16px;
+            }
+            QPushButton {
+                font-size: 14px;
+                padding: 10px 20px;
+                background: #3498db;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                margin: 5px;
+            }
+            QPushButton:hover {
+                background: #2980b9;
+            }
+        """)
+        
+        layout = QVBoxLayout(dialog)
+        
+        label = QLabel("Welchen Typ von Barcode möchten Sie hinzufügen?")
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(label)
+        
+        btn_layout = QHBoxLayout()
+        
+        # Knopf für Artikelnummer (Interne Materialnummer)
+        btn_article = QPushButton("Interne Materialnummer")
+        btn_article.setMinimumHeight(50)
+        
+        # Knopf für EAN-Code
+        btn_ean = QPushButton("EAN-Code")
+        btn_ean.setMinimumHeight(50)
+        
+        btn_layout.addWidget(btn_article)
+        btn_layout.addWidget(btn_ean)
+        
+        layout.addLayout(btn_layout)
+        
+        # Neue Barcode-ID bestimmen
+        new_index = len(self.all_barcodes)
+        
+        def add_barcode(is_article: bool):
+            if is_article:
+                new_barcode = {
+                    "value": "", 
+                    "type": "CODE128", 
+                    "image_index": -1, 
+                    "cropped_image": None,
+                    "is_article_number": True,
+                    "source": "manual"
+                }
+            else:
+                new_barcode = {
+                    "value": "", 
+                    "type": "EAN13", 
+                    "image_index": -1, 
+                    "cropped_image": None,
+                    "is_article_number": False,
+                    "source": "manual"
+                }
+            
+            self.all_barcodes.append(new_barcode)
+            dialog.accept()
+            
+            # Seite neu laden, um das neue Feld anzuzeigen
+            self.load_pages()
+            
+            # Direkt zur Storage Page springen (Index 3)
+            if self.stack.count() > 3:
+                self.stack.setCurrentIndex(3)
+        
+        btn_article.clicked.connect(lambda: add_barcode(True))
+        btn_ean.clicked.connect(lambda: add_barcode(False))
+        
+        dialog.exec()
+
+    def find_barcode_widgets(self, widget: QWidget) -> List[Tuple[QWidget, int]]:
+        """Findet alle Barcode-Widgets und ihre Indizes"""
+        barcode_widgets = []
+        
+        # Prüfe ob dies ein Barcode-Widget ist
+        if isinstance(widget, QFrame) and widget.objectName().startswith("barcode_widget_"):
+            try:
+                # Extrahiere den Index aus dem objectName
+                index_str = widget.objectName().replace("barcode_widget_", "")
+                index = int(index_str)
+                barcode_widgets.append((widget, index))
+            except:
+                pass
+        
+        # Rekursiv Kinder durchsuchen
+        for child in widget.children():
+            if isinstance(child, QWidget):
+                barcode_widgets.extend(self.find_barcode_widgets(child))
+        
+        return barcode_widgets
+
+    def get_storage_page_content(self) -> List[Any]:
+        """Erzeugt den dynamischen Inhalt für die Storage Pages"""
+        content = []
+        
+        # Übersetzungen laden
+        no_barcodes_text = self.translator.get_text(self.language, "storage", "no_barcodes")
+        add_barcode_btn_text = self.translator.get_text(self.language, "storage", "add_barcode_btn")
+        
+        # Stelle sicher, dass all_barcodes existiert
+        if not hasattr(self, 'all_barcodes'):
+            self.all_barcodes = []
+        
+        # Füge Barcode-Einträge hinzu
+        if self.all_barcodes:
+            self.barcode_input_widgets = []
+            
+            # Trenne EAN13 und Artikelnummern für bessere Darstellung
+            ean13_barcodes = [b for b in self.all_barcodes if not b.get('is_article_number', False)]
+            article_numbers = [b for b in self.all_barcodes if b.get('is_article_number', False)]
+            
+            # Zeige EAN13 Barcodes zuerst
+            if ean13_barcodes:
+                content.append(("text", f"EAN13 Barcodes ({len(ean13_barcodes)} erkannt):"))
+                for i, barcode in enumerate(ean13_barcodes):
+                    barcode_card = ("custom", self.create_editable_barcode_widget(barcode, i))
+                    content.append([barcode_card])
+            
+            # Zeige Artikelnummern
+            if article_numbers:
+                content.append(("text", f"Artikelnummern ({len(article_numbers)} erkannt):"))
+                start_idx = len(ean13_barcodes)
+                for j, article in enumerate(article_numbers):
+                    idx = start_idx + j
+                    article_card = ("custom", self.create_editable_barcode_widget(article, idx))
+                    content.append([article_card])
+        else:
+            # Keine Barcodes gefunden - Standardformular erstellen UND in all_barcodes speichern
+            content.append([("text", no_barcodes_text)])
+            
+            # Standard-EAN13 Feld erstellen und in all_barcodes speichern
+            empty_ean = {
+                "value": "", 
+                "type": "EAN13", 
+                "image_index": -1, 
+                "cropped_image": None,
+                "is_article_number": False,
+                "source": "manual"
+            }
+            self.all_barcodes.append(empty_ean)
+            ean_card = ("custom", self.create_editable_barcode_widget(empty_ean, 0))
+            content.append([ean_card])
+            
+            # Standard-Artikelnummer Feld erstellen und in all_barcodes speichern
+            empty_article = {
+                "value": "", 
+                "type": "CODE128",  # Standard für Artikelnummern
+                "image_index": -1, 
+                "cropped_image": None,
+                "is_article_number": True,
+                "source": "manual"
+            }
+            self.all_barcodes.append(empty_article)
+            article_card = ("custom", self.create_editable_barcode_widget(empty_article, 1))
+            content.append([article_card])
+        
+        # Button "Weiteren Barcode hinzufügen"
+        content.append([
+            ("button", add_barcode_btn_text, self.add_new_barcode_field)
+        ])
+        
+        # Buttons am Ende (SAP-Eintrag, Lokal speichern, Neu beginnen)
+        content.append([
+            ("button", self.translator.get_text(self.language, "storage", "sap_btn"), self.sap_integration_placeholder),
+            ("button", self.translator.get_text(self.language, "storage", "save_btn"), self.save_all_data_csv),
+            ("button", self.translator.get_text(self.language, "storage", "restart_btn"), self.rebeginn_application)
+        ])
+        
+        return content
+
+    def create_editable_barcode_widget(self, barcode: Dict, index: int) -> QFrame:
+        """Erstellt ein bearbeitbares Barcode-Widget mit Eingabefeldern"""
+        frame = QFrame()
+        frame.setObjectName(f"barcode_widget_{index}")
+        
+        # Bestimme ob Artikelnummer oder EAN13
+        is_article_number = barcode.get('is_article_number', False)
+        source = barcode.get('source', 'manual')
+        
+        # Größere Bildabmessungen
+        IMAGE_WIDTH = 500  # Statt 250
+        IMAGE_HEIGHT = 350  # Statt 150
+        
+        # Unterschiedliches Styling für Artikelnummer vs EAN13
+        if is_article_number:
+            frame_style = """
+                QFrame {
+                    background: #2C3E50;
+                    border: 2px solid #E67E22;
+                    border-radius: 12px;
+                    padding: 20px;
+                }
+            """
+            label_type = self.translator.get_text(self.language, "storage", "article_number_label")
+            type_hint = self.translator.get_text(self.language, "storage", "for_other")
+        else:
+            frame_style = """
+                QFrame {
+                    background: #34495E;
+                    border: 2px solid #3498db;
+                    border-radius: 12px;
+                    padding: 20px;
+                }
+            """
+            label_type = self.translator.get_text(self.language, "storage", "barcode_label")
+            type_hint = self.translator.get_text(self.language, "storage", "for_ean13")
+        
+        frame.setStyleSheet(frame_style + """
+            QLabel {
+                color: #ECF0F1;
+            }
+            QLineEdit, QComboBox {
+                background: #2C3E50;
+                border: 1px solid #5d6d7e;
+                border-radius: 6px;
+                padding: 8px;
+                color: #ECF0F1;
+                font-size: 14px;
+            }
+            QLineEdit:focus, QComboBox:focus {
+                border: 1px solid #3498db;
+            }
+        """)
+        
+        layout = QHBoxLayout(frame)
+        layout.setSpacing(20)
+        
+        # Linke Seite: Barcode-Bild mit Farbcodierung
+        image_container = QWidget()
+        image_layout = QVBoxLayout(image_container)
+        image_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        # Übersetzte Text für die GUI
+        type_label_text = self.translator.get_text(self.language, "storage", "type_label")
+        source_label_text = self.translator.get_text(self.language, "storage", "source_label")
+        
+        if "cropped_image" in barcode and barcode["cropped_image"] is not None:
+            cropped_img = barcode["cropped_image"]
+            
+            # Farbige Umrandung basierend auf Typ
+            border_color = (255, 165, 0) if is_article_number else (0, 255, 0)  # Orange für Artikel, Grün für EAN
+            
+            if len(cropped_img.shape) == 3:
+                bordered_img = cv2.copyMakeBorder(cropped_img, 8, 8, 8, 8, 
+                                                cv2.BORDER_CONSTANT, value=border_color)
+                if cropped_img.shape[2] == 3:
+                    bordered_img = cv2.cvtColor(bordered_img, cv2.COLOR_BGR2RGB)
+            else:
+                bordered_img = cv2.cvtColor(cropped_img, cv2.COLOR_GRAY2RGB)
+                bordered_img = cv2.copyMakeBorder(bordered_img, 8, 8, 8, 8,
+                                                cv2.BORDER_CONSTANT, value=border_color)
+            
+            # VERGRÖSSERT: Neue Bildgröße
+            pixmap = self.convert_to_pixmap(bordered_img, width=IMAGE_WIDTH, height=IMAGE_HEIGHT)
+            image_label = QLabel()
+            image_label.setPixmap(pixmap)
+            image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            
+            # Klick-Event für Vergrößerung hinzufügen
+            image_label.mousePressEvent = lambda event, img=cropped_img, barcode_type=("Artikelnummer" if is_article_number else "EAN"): self.show_enlarged_image(img, barcode_type)
+            image_label.setCursor(Qt.CursorShape.PointingHandCursor)
+            image_label.setToolTip("Klicken zum Vergrößern")
+            
+            image_layout.addWidget(image_label)
+            
+            # Bildquelle
+            image_names = ["ISO Bild", "Top Bild", "Right Bild", "Behind Bild"]
+            img_idx = barcode.get('image_index', 0)
+            if img_idx >= 0 and img_idx < len(image_names):
+                source_text = f"{source_label_text} {image_names[img_idx]}"
+            else:
+                source_text = f"{source_label_text} {self.translator.get_text(self.language, 'storage', 'manual')}"
+            
+            source_label = QLabel(source_text)
+            source_label.setStyleSheet("font-size: 12px; color: #BDC3C7; margin-top: 8px;")
+            source_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            image_layout.addWidget(source_label)
+        else:
+            placeholder = QLabel("Kein Bild verfügbar")
+            placeholder.setStyleSheet("""
+                color: #BDC3C7;
+                font-style: italic;
+                font-size: 14px;
+            """)
+            placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            placeholder.setFixedSize(IMAGE_WIDTH, IMAGE_HEIGHT)  # Auch Platzhalter vergrößern
+            image_layout.addWidget(placeholder)
+            
+            source_label = QLabel(f"{source_label_text} {self.translator.get_text(self.language, 'storage', 'manual')}")
+            source_label.setStyleSheet("font-size: 12px; color: #BDC3C7; margin-top: 8px;")
+            source_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            image_layout.addWidget(source_label)
+        layout.addWidget(image_container)
+        
+        # Rechte Seite: Bearbeitbare Informationen
+        info_container = QWidget()
+        info_layout = QVBoxLayout(info_container)
+        info_layout.setSpacing(15)
+        
+        # Typ-Anzeige (Artikelnummer oder Barcode) mit Hinweis
+        type_header = QLabel(f"{label_type} {type_hint}")
+        type_header.setStyleSheet("font-size: 16px; font-weight: bold; color: #F39C12;" if is_article_number else "font-size: 16px; font-weight: bold; color: #3498db;")
+        info_layout.addWidget(type_header)
+        
+        # Eingabefeld für Wert
+        barcode_input = QLineEdit()
+        barcode_input.setText(barcode.get('value', ''))
+        
+        if is_article_number:
+            barcode_input.setPlaceholderText("Artikelnummer hier eingeben...")
+        else:
+            barcode_input.setPlaceholderText("EAN13 Barcode hier eingeben...")
+        
+        barcode_input.textChanged.connect(lambda text: self.update_barcode_value(index, text))
+        info_layout.addWidget(barcode_input)
+        
+        # Barcode-Typ Auswahl
+        type_sublabel = QLabel(type_label_text)
+        type_sublabel.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 10px;")
+        info_layout.addWidget(type_sublabel)
+        
+        type_combo = QComboBox()
+        
+        type_combo.wheelEvent = lambda event: None  # Ignoriere alle Wheel-Events
+
+        # Barcode-Typen mit Trennung
+        type_combo.addItem("EAN13 - Produkt-Barcode")
+        type_combo.addItem("EAN8")
+        type_combo.addItem("UPC-A")
+        type_combo.addItem("UPC-E")
+        type_combo.addItem("CODE128 - Artikelnummer")
+        type_combo.addItem("CODE39 - Artikelnummer")
+        type_combo.addItem("ITF - Artikelnummer")
+        type_combo.addItem("QR - Artikelnummer")
+        type_combo.addItem("Andere - Artikelnummer")
+        
+        # Aktuellen Typ setzen
+        current_type = barcode.get('type', 'CODE128' if is_article_number else 'EAN13')
+        
+        # Mapping für die Anzeige
+        type_mapping = {
+            'EAN13': "EAN13 - Produkt-Barcode",
+            'EAN8': "EAN8",
+            'UPC-A': "UPC-A",
+            'UPC-E': "UPC-E",
+            'CODE128': "CODE128 - Artikelnummer",
+            'CODE39': "CODE39 - Artikelnummer",
+            'ITF': "ITF - Artikelnummer",
+            'QR': "QR - Artikelnummer"
+        }
+        
+        display_type = type_mapping.get(current_type, "Andere - Artikelnummer")
+        type_combo.setCurrentText(display_type)
+        
+        # Bei Typänderung: is_article_number aktualisieren
+        type_combo.currentTextChanged.connect(lambda text: self.update_barcode_type_and_status(index, text))
+        info_layout.addWidget(type_combo)
+        
+        # Status-Anzeige
+        status_label = QLabel()
+        if barcode.get('value'):
+            if is_article_number:
+                status_text = f"Artikelnummer {self.translator.get_text(self.language, 'storage', source)}"
+                status_color = "#E67E22"  # Orange
+            else:
+                status_text = f"EAN13 Barcode {self.translator.get_text(self.language, 'storage', source)}"
+                status_color = "#2ecc71"  # Grün
+        else:
+            if is_article_number:
+                status_text = "Artikelnummer bitte manuell eingeben"
+                status_color = "#e74c3c"  # Rot
+            else:
+                status_text = "EAN13 Barcode bitte manuell eingeben"
+                status_color = "#e74c3c"  # Rot
+        
+        status_label.setText(status_text)
+        status_label.setStyleSheet(f"color: {status_color}; font-weight: bold; margin-top: 10px;")
+        info_layout.addWidget(status_label)
+        
+        info_layout.addStretch()
+        layout.addWidget(info_container, stretch=1)
+        
+        # Referenzen speichern
+        frame.barcode_input = barcode_input
+        frame.type_combo = type_combo
+        frame.status_label = status_label
+        frame.is_article_number = is_article_number
+        
+        return frame
+
+
+    def update_barcode_value(self, index: int, value: str):
+        """Aktualisiert den Barcode-Wert"""
+        if index < len(self.all_barcodes):
+            self.all_barcodes[index]['value'] = value
+            
+            # Status aktualisieren
+            if hasattr(self, 'barcode_input_widgets') and index < len(self.barcode_input_widgets):
+                frame = self.barcode_input_widgets[index]
+                if value.strip():
+                    frame.status_label.setText("Barcode erkannt/bearbeitet")
+                    frame.status_label.setStyleSheet("color: #2ecc71; font-weight: bold; margin-top: 10px;")
+                else:
+                    frame.status_label.setText("Kein Barcode erkannt - Bitte manuell eingeben")
+                    frame.status_label.setStyleSheet("color: #e74c3c; font-weight: bold; margin-top: 10px;")
+
+    def update_barcode_type_and_status(self, index: int, display_type: str):
+        """Aktualisiert Barcode-Typ und is_article_number Flag"""
+        if index >= len(self.all_barcodes):
+            return
+        
+        # Extrahiere den reinen Typ aus der Anzeige
+        if " - " in display_type:
+            barcode_type = display_type.split(" - ")[0]
+        else:
+            barcode_type = display_type
+        
+        # Bestimme ob Artikelnummer (alles außer EAN13)
+        is_article_number = (barcode_type != "EAN13")
+        
+        # Update in der Datenstruktur
+        self.all_barcodes[index]['type'] = barcode_type
+        self.all_barcodes[index]['is_article_number'] = is_article_number
+        
+        logger.info(f"Barcode {index}: Typ auf {barcode_type} gesetzt, Artikelnummer={is_article_number}")
+        
+        # GUI aktualisieren (Seite neu laden für Farbänderung)
+        self.load_pages()
+        if self.stack.count() > 3:
+            self.stack.setCurrentIndex(3)
+
+    def save_all_data_csv(self):
+        """Speichert alle Daten in CSV mit Trennung von EAN und Artikelnummern"""
+        try:
+            # Ordner für Bilder erstellen
+            scan_folder = f"Scan_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            os.makedirs(scan_folder, exist_ok=True)
+            
+            # ISO-Bild speichern
+            iso_bild_pfad = ""
+            if self.images and len(self.images) > 0 and self.images[0] is not None:
+                iso_bild_datei = "iso_bild.jpg"
+                iso_bild_pfad = os.path.join(scan_folder, iso_bild_datei)
+                if len(self.images[0].shape) == 3 and self.images[0].shape[2] == 3:
+                    bgr_img = cv2.cvtColor(self.images[0], cv2.COLOR_RGB2BGR)
+                else:
+                    bgr_img = self.images[0]
+                cv2.imwrite(iso_bild_pfad, bgr_img)
+            
+            # CSV-Datei erstellen
+            csv_datei = os.path.join(scan_folder, "scanner_daten.csv")
+            
+            with open(csv_datei, 'w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.writer(csvfile, delimiter=';')
+                
+                # NEUE Kopfzeile mit separaten Spalten für EAN und Artikelnummer
+                writer.writerow([
+                    "Interne_Materialnummer",
+                    "Gewicht [kg]",
+                    "Abmessungen L [mm]",
+                    "Abmessungen B [mm]", 
+                    "Abmessungen H [mm]",
+                    "EAN-Code",
+                    "Iso_Bild"
+                ])
+                
+                # Abmessungen parsen
+                laenge = breite = hoehe = 0
+                if self.abmessung and self.abmessung != "Undefiniert":
+                    try:
+                        teile = self.abmessung.split(" x ")
+                        if len(teile) >= 2:
+                            laenge = float(teile[0])
+                            breite = float(teile[1])
+                            hoehe = float(teile[2]) if len(teile) > 2 else 0
+                    except:
+                        pass
+                
+                # Gewicht parsen
+                gewicht = 0
+                if self.gewicht and self.gewicht != "Undefiniert":
+                    try:
+                        gewicht_str = str(self.gewicht).replace("kg", "").strip()
+                        gewicht = float(gewicht_str)
+                    except:
+                        pass
+                
+                # Trenne EAN13 und Artikelnummern
+                ean_codes = []
+                article_numbers = []
+                
+                if hasattr(self, 'all_barcodes'):
+                    for barcode in self.all_barcodes:
+                        value = barcode.get('value', '').strip()
+                        if not value:
+                            continue
+                        
+                        if barcode.get('is_article_number', False):
+                            article_numbers.append(value)
+                        else:
+                            ean_codes.append(value)
+                
+                # Für jede Kombination eine Zeile erstellen
+                # Wenn keine Barcodes, eine leere Zeile
+                if not ean_codes and not article_numbers:
+                    writer.writerow([
+                        "",  # Interne_Materialnummer
+                        f"{gewicht:.3f}".replace(".", ","),
+                        f"{laenge:.0f}".replace(".", ","),
+                        f"{breite:.0f}".replace(".", ","),
+                        f"{hoehe:.0f}".replace(".", ","),
+                        "",  # EAN-Code
+                        iso_bild_pfad if iso_bild_pfad else ""
+                    ])
+                else:
+                    # Kombiniere alle Möglichkeiten
+                    for ean in (ean_codes if ean_codes else [""]):
+                        for article in (article_numbers if article_numbers else [""]):
+                            writer.writerow([
+                                article,
+                                f"{gewicht:.3f}".replace(".", ","),
+                                f"{laenge:.0f}".replace(".", ","),
+                                f"{breite:.0f}".replace(".", ","),
+                                f"{hoehe:.0f}".replace(".", ","),
+                                ean,
+                                iso_bild_pfad if iso_bild_pfad else ""
+                            ])
+                
+            # Erfolgsmeldung
+            QMessageBox.information(self, "CSV erstellt", f"Daten gespeichert in: {scan_folder}\n\n")
+            
+            logger.info(f"Daten gespeichert: {len(ean_codes)} EANs, {len(article_numbers)} Artikelnummern")
+            
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Speicherfehler",
+                f"Fehler beim Speichern:\n{str(e)}"
+            )
+            logger.error(f"Fehler in save_all_data_csv: {e}")
+
 
     def go_back(self):
         """Geht zur vorherigen Seite"""
@@ -1260,16 +1888,13 @@ class FullscreenApp(QMainWindow):
         
         # Spezialfall: Von Foto-Auswahl (Index 1) zurück zur Startseite (Index 0)
         if idx == 1:
-            self.scan_start = False
-            reply = QMessageBox.question(
-                self,
-                "Datenverlust bestätigen",
-                "Möchten Sie wirklich zurück zur Startseite? Alle erfassten Daten gehen verloren.",
-                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
-
-            if reply == QMessageBox.StandardButton.Cancel:
+            if QMessageBox.question(self, self.translator.get_text(self.language, "messagebox", "data_loss_confirm"), 
+                                          self.translator.get_text(self.language, "messagebox", "data_loss_message"),
+                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel) == QMessageBox.StandardButton.Cancel:
                 return
-        
+            self.scan_start = False
+
+
         # Spezialfall: Von Kamera-Übersicht (Index 2) zurück zur Foto-Auswahl (Index 1)
         if idx == 2:
             # Setze scan_start zurück, damit wir neue Bilder aufnehmen können
@@ -1319,8 +1944,8 @@ class FullscreenApp(QMainWindow):
             else:
                 QMessageBox.warning(
                     self,
-                    "Keine Bilder",
-                    "Bitte nehmen Sie zuerst Bilder auf, bevor Sie fortfahren."
+                    self.translator.get_text(self.language, "messagebox", "no_images_title"),
+                    self.translator.get_text(self.language, "messagebox", "no_images_message")
                 )
         elif idx == 2:
             self.stack.setCurrentIndex(idx + 1)
@@ -1390,8 +2015,8 @@ class FullscreenApp(QMainWindow):
                 self.scan_start = False
                 QMessageBox.information(
                     self,
-                    "Scan abgeschlossen",
-                    "Der Scan war erfolgreich!\nDie Daten stehen nun zur Verfügung."
+                    self.translator.get_text(self.language, "messagebox", "scan_completed_title"),
+                    self.translator.get_text(self.language, "messagebox", "scan_completed_message")
                 )
         
         def cancel_loading():
@@ -1407,8 +2032,8 @@ class FullscreenApp(QMainWindow):
             self.update_buttons()
             QMessageBox.warning(
                 self,
-                "Scan abgebrochen",
-                "Der Scan wurde abgebrochen."
+                self.translator.get_text(self.language, "messagebox", "scan_aborted_title"),
+                self.translator.get_text(self.language, "messagebox", "scan_aborted_message")
             )
         
         # Verbindungen herstellen
@@ -1469,7 +2094,7 @@ class FullscreenApp(QMainWindow):
             self.progress_bar.setValue(value)
 
     def handle_output(self, script_name: str, data: Any):
-        """Verarbeitet die Ergebnisse der Worker-Threads"""
+        """Verarbeitet die Ergebnisse der Worker-Threads mit Barcode-Speicherung"""
         logger.info(f"Ergebnis von {script_name} erhalten: Typ={type(data)}")
         
         if script_name == "Abmessung":
@@ -1519,53 +2144,119 @@ class FullscreenApp(QMainWindow):
                         # BEHALTE RGB
                         self.final_images[i] = data[i]
                         logger.debug(f"Final image {i} gesetzt (Größe: {self.final_images[i].shape}, Typ: {self.final_images[i].dtype})")
-                        
-                        # Debug: Prüfe den Farbraum
-                        if len(self.final_images[i].shape) == 3:
-                            logger.debug(f"  Kanalreihenfolge: {self.final_images[i].shape[2]} Kanäle")
                     else:
                         self.final_images[i] = None
-                        logger.debug(f"Final image {i} ist None (keep={self.keep[i]})")
             else:
                 logger.error(f"Unerwartetes Format für yolo_frames: {type(data)}")
 
         elif script_name == "barcode":
-            idx = data.get("index", -1)
-            found = data.get("found", False)
-            value = data.get("value", None)
-            b_type = data.get("type", None)
+            logger.info(f"Barcode-Daten empfangen: {data}")
             
-            if found:
-                self.barcode = value
-                self.barcode_type = b_type
-                logger.info(f"Barcode erkannt: Wert='{value}', Typ='{b_type}'")
+            # Initialisiere all_barcodes wenn nötig
+            if not hasattr(self, 'all_barcodes'):
+                self.all_barcodes = []
             else:
-                logger.debug(f"Kein Barcode in Bild {idx}")
-
+                # Lösche alte Barcodes, bevor neue hinzugefügt werden
+                self.all_barcodes.clear()
+            
+            # Überprüfe den Typ von data
+            if isinstance(data, list):
+                # Falls data bereits eine Liste von Barcode-Dicts ist
+                for barcode in data:
+                    if isinstance(barcode, dict) and barcode.get("found", False):
+                        barcode_info = {
+                            "value": barcode.get("value"),
+                            "type": barcode.get("type"),
+                            "image_index": barcode.get("image_index", 0),
+                            "cropped_image": barcode.get("cropped_image")
+                        }
+                        self.all_barcodes.append(barcode_info)
+                
+                logger.info(f"{len(self.all_barcodes)} Barcodes gesammelt")
+                
+                # Debug-Ausgabe der Barcode-Daten
+                for i, barcode in enumerate(self.all_barcodes):
+                    logger.info(f"Barcode {i}: Wert={barcode.get('value')}, Typ={barcode.get('type')}")
+                    
+            elif isinstance(data, dict):
+                # Falls data ein einzelnes Barcode-Dict ist (für Kompatibilität)
+                if data.get("found", False):
+                    barcode_info = {
+                        "value": data.get("value"),
+                        "type": data.get("type"),
+                        "image_index": data.get("image_index", 0),
+                        "cropped_image": data.get("cropped_image")
+                    }
+                    self.all_barcodes.append(barcode_info)
+                    logger.info(f"Barcode gespeichert: {data.get('value')}")
+                else:
+                    logger.info("Barcode wurde nicht gefunden (found=False)")
+            else:
+                logger.error(f"Unerwartetes Format für barcode: {type(data)} - {data}")
+                
         elif script_name == "weight":
             self.gewicht = data
             logger.info(f"Gewicht: {data}")
-
+        
+        # Prüfe ob alle Daten vorhanden sind und aktualisiere GUI
         self._check_and_update_gui()
 
     def _check_and_update_gui(self):
         """Prüft ob alle Daten vorhanden sind und aktualisiert die GUI"""
+        # Stelle sicher, dass all_barcodes existiert
+        if not hasattr(self, 'all_barcodes'):
+            self.all_barcodes = []
+        
+        # Stelle sicher, dass abmessung und gewicht existieren
+        if not hasattr(self, 'abmessung') or self.abmessung is None:
+            self.abmessung = "Undefiniert"
+        if not hasattr(self, 'gewicht') or self.gewicht is None:
+            self.gewicht = "Undefiniert"
+        
+        # Nach der Barcode-Erkennung Zugeschnittene Bilder erstellen
+        if self.all_barcodes and hasattr(self, 'images'):
+            for barcode in self.all_barcodes:
+                if barcode.get("cropped_image") is None:
+                    img_idx = barcode.get("image_index", 0)
+                    if img_idx < len(self.images) and self.images[img_idx] is not None:
+                        img = self.images[img_idx]
+                        if img is not None:
+                            # Erstelle einen Ausschnitt um den Barcode herum
+                            h, w = img.shape[:2]
+                            crop_h = min(300, h)
+                            crop_w = min(500, w)
+                            x = max(0, w // 2 - crop_w // 2)
+                            y = max(0, h // 2 - crop_h // 2)
+                            
+                            # BGR zu RGB konvertieren für Qt
+                            roi = img[y:y+crop_h, x:x+crop_w]
+                            if len(roi.shape) == 3 and roi.shape[2] == 3:
+                                roi_rgb = cv2.cvtColor(roi, cv2.COLOR_BGR2RGB)
+                            else:
+                                roi_rgb = roi
+                            
+                            barcode["cropped_image"] = roi_rgb
+        
         # Prüfe ob alle notwendigen Daten vorhanden sind
-        has_abmessung = hasattr(self, "abmessung") and self.abmessung not in [None, "Undefiniert"]
-        has_barcode = hasattr(self, "barcode") and self.barcode not in [None, "Undefiniert"]
-        has_gewicht = hasattr(self, "gewicht") and self.gewicht not in [None, "Undefiniert"]
+        has_abmessung = self.abmessung not in [None, "Undefiniert"]
+        has_gewicht = self.gewicht not in [None, "Undefiniert"]
+        has_barcodes = len(self.all_barcodes) > 0
+        has_yolo_frames = hasattr(self, "annotierte_frames") and self.annotierte_frames
         
-        # Wir aktualisieren die GUI wenn:
-        # 1. Alle Daten vorhanden sind, ODER
-        # 2. Die YOLO-Frames vorhanden sind (für Bildanzeige)
-        
+        # GUI aktualisieren wenn:
+        # 1. Alle Daten vorhanden sind (Abmessung, Gewicht), ODER
+        # 2. YOLO-Frames vorhanden sind (für Bildanzeige), ODER
+        # 3. Barcodes erkannt wurden
         update_needed = False
         
-        if has_abmessung and has_barcode and has_gewicht:
-            logger.info("Alle Daten vorhanden - aktualisiere GUI")
+        if has_abmessung and has_gewicht:
+            logger.info("Alle Hauptdaten vorhanden - aktualisiere GUI")
             update_needed = True
-        elif hasattr(self, "annotierte_frames") and self.annotierte_frames:
+        elif has_yolo_frames:
             logger.info("YOLO-Frames vorhanden - aktualisiere Bilder in GUI")
+            update_needed = True
+        elif has_barcodes:
+            logger.info("Barcodes vorhanden - aktualisiere GUI")
             update_needed = True
         
         if update_needed:
@@ -1616,8 +2307,5 @@ if __name__ == "__main__":
     w = FullscreenApp()
     w.show()
     sys.exit(app.exec())
-
-
-
 
 
