@@ -1,1149 +1,141 @@
-2025-12-02 14:52:14,577 - __main__ - INFO - 3D-Scanner wird gestartet...
-2025-12-02 14:52:16,997 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
-2025-12-02 14:52:18,494 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 14:52:20,241 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 14:52:21,392 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 14:52:22,963 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 14:52:24,213 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 14:52:46,491 - __main__ - INFO - Ergebnis von Abmessung: ['0 x 0', '0 x 0', '0 x 0', '0 x 0']
-2025-12-02 14:52:46,491 - __main__ - INFO - Gesamt-Abmessung: 0 x 0 x 0
-2025-12-02 14:52:46,507 - __main__ - INFO - Ergebnis von yolo_frames: [array([[[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       ...,
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       ...,
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       ...,
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       ...,
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]]], dtype=uint8)]
-2025-12-02 14:52:46,615 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 14:53:50,014 - __main__ - INFO - Ergebnis von barcode: {'index': 0, 'found': False, 'value': None, 'type': None}
-2025-12-02 14:53:50,014 - __main__ - INFO - Ergebnis von barcode: {'index': 1, 'found': False, 'value': None, 'type': None}
-2025-12-02 14:53:50,015 - __main__ - INFO - Ergebnis von barcode: {'index': 2, 'found': False, 'value': None, 'type': None}
-2025-12-02 14:53:50,015 - __main__ - INFO - Ergebnis von barcode: {'index': 3, 'found': False, 'value': None, 'type': None}
-2025-12-02 14:53:50,017 - __main__ - INFO - Ergebnis von weight: 5
-2025-12-02 14:53:50,017 - __main__ - INFO - Gewicht: 5
-2025-12-02 14:53:50,018 - __main__ - INFO - Alle Tasks fertig
-2025-12-02 14:54:03,281 - __main__ - INFO - Sprache geändert zu: it
-2025-12-02 14:54:05,661 - __main__ - INFO - Sprache geändert zu: en
-2025-12-02 14:54:06,001 - __main__ - INFO - Sprache geändert zu: it
-2025-12-02 14:54:06,430 - __main__ - INFO - Sprache geändert zu: de
-2025-12-02 14:54:06,738 - __main__ - INFO - Sprache geändert zu: en
-2025-12-02 14:54:07,099 - __main__ - INFO - Sprache geändert zu: it
-2025-12-02 14:54:07,570 - __main__ - INFO - Sprache geändert zu: de
-2025-12-02 14:54:08,545 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 14:54:10,207 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 14:54:11,680 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 14:54:13,231 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 14:54:14,802 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 14:54:16,073 - __main__ - INFO - Sprache geändert zu: it
-2025-12-02 15:01:23,194 - __main__ - INFO - 3D-Scanner wird gestartet...
-2025-12-02 15:01:25,017 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
-2025-12-02 15:01:29,572 - __main__ - INFO - Mess-System-Prüfung gestartet
-2025-12-02 15:01:30,710 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 15:01:32,066 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:01:33,170 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:01:34,330 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:01:35,828 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:01:37,567 - __main__ - INFO - Wiederhole Bild 1
-2025-12-02 15:01:38,728 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:01:39,390 - __main__ - INFO - Wiederhole Bild 1
-2025-12-02 15:01:40,483 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:01:40,492 - __main__ - INFO - Verworfen Bild 1
-2025-12-02 15:01:41,669 - __main__ - INFO - Verworfen Bild 2
-2025-12-02 15:01:42,185 - __main__ - INFO - Verworfen Bild 4
-2025-12-02 15:01:43,746 - __main__ - INFO - Verworfen Bild 3
-2025-12-02 15:01:58,941 - __main__ - INFO - Ergebnis von Abmessung: ['0 x 0', '0 x 0', '0 x 0', '0 x 0']
-2025-12-02 15:01:58,941 - __main__ - INFO - Gesamt-Abmessung: 0 x 0 x 0
-2025-12-02 15:01:58,945 - __main__ - INFO - Ergebnis von yolo_frames: [array([[[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       ...,
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       ...,
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       ...,
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]]], dtype=uint8), array([[[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       ...,
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]]], dtype=uint8)]
-2025-12-02 15:01:59,074 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 15:03:02,711 - __main__ - INFO - Ergebnis von barcode: {'index': 0, 'found': False, 'value': None, 'type': None}
-2025-12-02 15:03:02,711 - __main__ - INFO - Ergebnis von barcode: {'index': 1, 'found': False, 'value': None, 'type': None}
-2025-12-02 15:03:02,712 - __main__ - INFO - Ergebnis von barcode: {'index': 2, 'found': False, 'value': None, 'type': None}
-2025-12-02 15:03:02,712 - __main__ - INFO - Ergebnis von barcode: {'index': 3, 'found': False, 'value': None, 'type': None}
-2025-12-02 15:03:02,717 - __main__ - INFO - Ergebnis von weight: 5
-2025-12-02 15:03:02,718 - __main__ - INFO - Gewicht: 5
-2025-12-02 15:03:02,719 - __main__ - INFO - Alle Tasks fertig
-2025-12-02 15:10:34,267 - __main__ - INFO - 3D-Scanner wird gestartet...
-2025-12-02 15:10:36,134 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
-2025-12-02 15:10:38,035 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 15:10:39,386 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:10:40,518 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:10:41,112 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:10:42,202 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:10:43,607 - __main__ - INFO - Wiederhole Bild 3
-2025-12-02 15:10:43,608 - __main__ - WARNING - Kamera 2 nicht verfügbar
-2025-12-02 15:10:47,350 - __main__ - INFO - Wiederhole Bild 1
-2025-12-02 15:10:48,483 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:10:51,171 - __main__ - INFO - Wiederhole Bild 1
-2025-12-02 15:10:52,352 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:10:53,822 - __main__ - INFO - Sprache geändert zu: it
-2025-12-02 15:10:54,609 - __main__ - INFO - Sprache geändert zu: de
-2025-12-02 15:10:55,511 - __main__ - INFO - Sprache geändert zu: en
-2025-12-02 15:10:56,959 - __main__ - INFO - Sprache geändert zu: de
-2025-12-02 15:31:38,110 - __main__ - INFO - 3D-Scanner wird gestartet...
-2025-12-02 15:31:40,065 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
-2025-12-02 15:31:41,992 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 15:31:43,448 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:31:44,998 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:31:45,580 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:31:47,064 - __main__ - ERROR - Fehler bei Bildaufnahme von Kamera 0: __enter__
-2025-12-02 15:36:17,109 - __main__ - INFO - 3D-Scanner wird gestartet...
-2025-12-02 15:36:19,044 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
-2025-12-02 15:36:20,205 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 15:36:22,112 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:36:23,703 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:36:24,662 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:36:26,188 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:36:28,193 - __main__ - INFO - Ergebnis von weight: 5
-2025-12-02 15:36:28,194 - __main__ - INFO - Gewicht: 5
-2025-12-02 15:36:32,702 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 15:36:34,285 - __main__ - INFO - Ergebnis von barcode: {'index': 0, 'found': False, 'value': None, 'type': None}
-2025-12-02 15:36:34,286 - __main__ - INFO - Ergebnis von barcode: {'index': 1, 'found': False, 'value': None, 'type': None}
-2025-12-02 15:36:34,286 - __main__ - INFO - Ergebnis von barcode: {'index': 2, 'found': False, 'value': None, 'type': None}
-2025-12-02 15:36:34,287 - __main__ - INFO - Ergebnis von barcode: {'index': 3, 'found': False, 'value': None, 'type': None}
-2025-12-02 15:36:42,790 - __main__ - INFO - Ergebnis von Abmessung: ['43 x 54', '405 x 328', '427 x 331', '427 x 331']
-2025-12-02 15:36:42,791 - __main__ - INFO - Gesamt-Abmessung: 43 x 405 x 331
-2025-12-02 15:36:42,795 - __main__ - INFO - Ergebnis von yolo_frames: [array([[[ 83,  95, 106],
-        [ 91, 103, 114],
-        [ 87, 102, 117],
-        ...,
-        [251, 251, 251],
-        [251, 251, 251],
-        [251, 251, 251]],
-
-       [[ 95, 107, 118],
-        [ 87,  99, 110],
-        [ 76,  91, 106],
-        ...,
-        [251, 251, 251],
-        [251, 251, 251],
-        [251, 251, 251]],
-
-       [[ 93, 105, 114],
-        [ 91, 103, 112],
-        [ 84,  98, 111],
-        ...,
-        [251, 251, 251],
-        [251, 251, 251],
-        [251, 251, 251]],
-
-       ...,
-
-       [[ 98,  93,  76],
-        [ 98,  93,  76],
-        [ 98,  93,  76],
-        ...,
-        [132, 110,  77],
-        [136, 115,  85],
-        [144, 123,  93]],
-
-       [[ 97,  93,  73],
-        [ 98,  94,  74],
-        [ 98,  94,  74],
-        ...,
-        [142, 121,  84],
-        [137, 115,  82],
-        [137, 115,  82]],
-
-       [[ 97,  93,  73],
-        [ 97,  93,  73],
-        [ 98,  94,  74],
-        ...,
-        [156, 135,  98],
-        [140, 118,  85],
-        [135, 113,  80]]], dtype=uint8), array([[[111, 115, 143],
-        [111, 115, 143],
-        [110, 117, 143],
-        ...,
-        [251, 251, 251],
-        [251, 251, 251],
-        [251, 251, 251]],
-
-       [[112, 116, 144],
-        [112, 116, 144],
-        [110, 117, 143],
-        ...,
-        [251, 251, 251],
-        [251, 251, 251],
-        [251, 251, 251]],
-
-       [[107, 119, 144],
-        [107, 119, 144],
-        [107, 119, 144],
-        ...,
-        [251, 251, 251],
-        [251, 251, 251],
-        [251, 251, 251]],
-
-       ...,
-
-       [[100,  99, 103],
-        [100,  99, 103],
-        [100,  98, 104],
-        ...,
-        [115, 110, 105],
-        [115, 110, 105],
-        [116, 111, 106]],
-
-       [[ 96,  95,  99],
-        [ 96,  95,  99],
-        [ 97,  95, 101],
-        ...,
-        [115, 108, 108],
-        [115, 108, 108],
-        [116, 109, 109]],
-
-       [[ 93,  92,  96],
-        [ 94,  93,  97],
-        [ 95,  93,  99],
-        ...,
-        [115, 108, 108],
-        [115, 108, 108],
-        [116, 109, 109]]], dtype=uint8), array([[[101, 111, 136],
-        [102, 112, 137],
-        [103, 113, 138],
-        ...,
-        [251, 251, 251],
-        [251, 251, 251],
-        [251, 251, 251]],
-
-       [[102, 112, 137],
-        [103, 113, 138],
-        [105, 115, 140],
-        ...,
-        [251, 251, 251],
-        [251, 251, 251],
-        [251, 251, 251]],
-
-       [[103, 114, 136],
-        [103, 114, 136],
-        [103, 115, 140],
-        ...,
-        [251, 251, 251],
-        [251, 251, 251],
-        [251, 251, 251]],
-
-       ...,
-
-       [[ 97,  90,  85],
-        [ 96,  89,  84],
-        [ 96,  89,  84],
-        ...,
-        [141, 124, 116],
-        [126, 115, 115],
-        [118, 107, 107]],
-
-       [[102,  91,  84],
-        [100,  89,  82],
-        [ 98,  90,  82],
-        ...,
-        [186, 158, 134],
-        [175, 155, 136],
-        [176, 156, 137]],
-
-       [[101,  90,  83],
-        [100,  89,  82],
-        [ 98,  90,  82],
-        ...,
-        [178, 150, 126],
-        [178, 158, 139],
-        [177, 157, 138]]], dtype=uint8), array([[[103, 113, 138],
-        [103, 113, 138],
-        [101, 113, 138],
-        ...,
-        [251, 251, 251],
-        [251, 251, 251],
-        [251, 251, 251]],
-
-       [[103, 113, 138],
-        [103, 113, 138],
-        [101, 113, 138],
-        ...,
-        [251, 251, 251],
-        [251, 251, 251],
-        [251, 251, 251]],
-
-       [[101, 113, 138],
-        [101, 113, 138],
-        [101, 113, 138],
-        ...,
-        [251, 251, 251],
-        [251, 251, 251],
-        [251, 251, 251]],
-
-       ...,
-
-       [[ 97,  91,  83],
-        [ 97,  91,  83],
-        [ 97,  91,  83],
-        ...,
-        [219, 195, 167],
-        [191, 169, 146],
-        [169, 147, 124]],
-
-       [[ 97,  91,  83],
-        [ 96,  90,  82],
-        [ 96,  90,  82],
-        ...,
-        [211, 181, 148],
-        [207, 180, 148],
-        [200, 173, 141]],
-
-       [[ 96,  90,  82],
-        [ 96,  90,  82],
-        [ 96,  90,  82],
-        ...,
-        [182, 152, 119],
-        [182, 155, 123],
-        [180, 153, 121]]], dtype=uint8)]
-2025-12-02 15:36:42,800 - __main__ - INFO - Alle Tasks fertig
-2025-12-02 15:36:59,167 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 15:37:01,274 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:37:03,184 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:37:04,772 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:37:05,729 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:37:05,828 - __main__ - INFO - Ergebnis von weight: 5
-2025-12-02 15:37:05,839 - __main__ - INFO - Gewicht: 5
-2025-12-02 15:37:06,139 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 15:42:04,856 - __main__ - INFO - 3D-Scanner wird gestartet...
-2025-12-02 15:42:06,787 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
-2025-12-02 15:42:08,041 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 15:42:09,932 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:42:11,508 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:42:12,510 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:42:14,004 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:42:15,401 - __main__ - INFO - Wiederhole Bild 4
-2025-12-02 15:42:15,401 - __main__ - WARNING - Kamera 3 nicht verfügbar
-2025-12-02 15:42:17,621 - __main__ - INFO - Ergebnis von weight: 5
-2025-12-02 15:42:17,621 - __main__ - INFO - Gewicht: 5
-2025-12-02 15:42:22,025 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 15:42:32,458 - __main__ - INFO - Ergebnis von Abmessung: ['421 x 322', '429 x 322', '423 x 322', '0 x 0']
-2025-12-02 15:42:32,458 - __main__ - INFO - Gesamt-Abmessung: 421 x 429 x 322
-2025-12-02 15:42:32,463 - __main__ - INFO - Ergebnis von yolo_frames: [array([[[111, 133, 161],
-        [111, 133, 161],
-        [113, 133, 161],
-        ...,
-        [254, 236, 183],
-        [255, 237, 184],
-        [255, 239, 186]],
-
-       [[112, 134, 162],
-        [112, 134, 162],
-        [116, 136, 164],
-        ...,
-        [254, 236, 183],
-        [254, 236, 183],
-        [255, 237, 184]],
-
-       [[114, 136, 164],
-        [114, 136, 164],
-        [116, 136, 164],
-        ...,
-        [254, 236, 183],
-        [254, 236, 183],
-        [254, 236, 183]],
-
-       ...,
-
-       [[107,  99,  78],
-        [107,  99,  78],
-        [107,  99,  78],
-        ...,
-        [145, 115,  84],
-        [145, 115,  84],
-        [145, 115,  84]],
-
-       [[107,  99,  78],
-        [107,  99,  78],
-        [107,  99,  78],
-        ...,
-        [137, 115,  82],
-        [137, 115,  82],
-        [135, 113,  80]],
-
-       [[108, 100,  79],
-        [108, 100,  79],
-        [108, 100,  79],
-        ...,
-        [133, 111,  78],
-        [133, 111,  78],
-        [132, 110,  77]]], dtype=uint8), array([[[118, 130, 160],
-        [118, 130, 160],
-        [119, 132, 159],
-        ...,
-        [253, 239, 180],
-        [254, 240, 183],
-        [255, 242, 185]],
-
-       [[120, 132, 162],
-        [120, 132, 162],
-        [122, 135, 162],
-        ...,
-        [252, 238, 179],
-        [252, 238, 181],
-        [254, 240, 183]],
-
-       [[122, 134, 164],
-        [123, 135, 165],
-        [121, 137, 163],
-        ...,
-        [252, 238, 179],
-        [252, 238, 179],
-        [254, 240, 181]],
-
-       ...,
-
-       [[109,  96,  76],
-        [109,  96,  76],
-        [109,  96,  76],
-        ...,
-        [138, 109,  74],
-        [138, 109,  74],
-        [138, 109,  74]],
-
-       [[109,  96,  74],
-        [109,  96,  74],
-        [109,  96,  74],
-        ...,
-        [138, 108,  77],
-        [137, 107,  76],
-        [137, 107,  76]],
-
-       [[109,  96,  74],
-        [109,  96,  74],
-        [109,  96,  74],
-        ...,
-        [136, 106,  75],
-        [133, 103,  72],
-        [132, 102,  71]]], dtype=uint8), array([[[119, 129, 164],
-        [120, 130, 165],
-        [122, 132, 167],
-        ...,
-        [254, 242, 178],
-        [255, 243, 179],
-        [253, 241, 177]],
-
-       [[120, 130, 165],
-        [122, 132, 167],
-        [122, 132, 167],
-        ...,
-        [255, 243, 179],
-        [253, 241, 177],
-        [251, 239, 175]],
-
-       [[123, 133, 168],
-        [123, 133, 168],
-        [123, 133, 168],
-        ...,
-        [255, 243, 179],
-        [255, 242, 181],
-        [253, 240, 179]],
-
-       ...,
-
-       [[113, 100,  78],
-        [113, 100,  78],
-        [112,  99,  77],
-        ...,
-        [152, 119,  84],
-        [152, 119,  84],
-        [152, 119,  84]],
-
-       [[113,  99,  74],
-        [113,  99,  74],
-        [113,  98,  76],
-        ...,
-        [147, 115,  82],
-        [147, 115,  82],
-        [147, 115,  82]],
-
-       [[111,  97,  72],
-        [111,  97,  72],
-        [113,  98,  76],
-        ...,
-        [142, 110,  77],
-        [141, 109,  76],
-        [141, 109,  76]]], dtype=uint8), array([[[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       ...,
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]],
-
-       [[0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0],
-        ...,
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]]], dtype=uint8)]
-2025-12-02 15:42:43,186 - __main__ - INFO - Ergebnis von barcode: {'index': 0, 'found': False, 'value': None, 'type': None}
-2025-12-02 15:42:43,187 - __main__ - INFO - Ergebnis von barcode: {'index': 1, 'found': False, 'value': None, 'type': None}
-2025-12-02 15:42:43,188 - __main__ - INFO - Ergebnis von barcode: {'index': 2, 'found': False, 'value': None, 'type': None}
-2025-12-02 15:42:43,188 - __main__ - INFO - Ergebnis von barcode: {'index': 3, 'found': False, 'value': None, 'type': None}
-2025-12-02 15:42:43,189 - __main__ - INFO - Alle Tasks fertig
-2025-12-02 15:47:44,493 - __main__ - INFO - 3D-Scanner wird gestartet...
-2025-12-02 15:47:46,385 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
-2025-12-02 15:47:47,676 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 15:47:49,558 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:47:51,158 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:47:52,098 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:47:53,599 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:47:55,122 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'int'>
-2025-12-02 15:47:55,123 - __main__ - INFO - Gewicht: 5
-2025-12-02 15:47:59,476 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 15:47:59,695 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
-2025-12-02 15:47:59,696 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
-2025-12-02 15:48:00,902 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:48:00,903 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:48:00,903 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:48:00,904 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:48:02,540 - __main__ - INFO - Bild 0: YOLO erkannt - 25 x 23
-2025-12-02 15:48:02,541 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
-2025-12-02 15:48:04,862 - __main__ - INFO - Bild 1: YOLO erkannt - 385 x 332
-2025-12-02 15:48:04,863 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
-2025-12-02 15:48:07,141 - __main__ - INFO - Bild 2: YOLO erkannt - 85 x 88
-2025-12-02 15:48:07,143 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
-2025-12-02 15:48:09,468 - __main__ - INFO - Bild 3: YOLO erkannt - 77 x 89
-2025-12-02 15:48:09,469 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['25 x 23', '385 x 332', '85 x 88', '77 x 89']
-2025-12-02 15:48:09,470 - __main__ - INFO - Ergebnis von Abmessung erhalten: Typ=<class 'list'>
-2025-12-02 15:48:09,470 - __main__ - INFO - Abmessungen erhalten: ['25 x 23', '385 x 332', '85 x 88', '77 x 89']
-2025-12-02 15:48:09,470 - __main__ - INFO - Gesamt-Abmessung berechnet: 25 x 25 x 23
-2025-12-02 15:48:09,470 - __main__ - INFO - Ergebnis von yolo_frames erhalten: Typ=<class 'list'>
-2025-12-02 15:48:09,471 - __main__ - INFO - Erhalte 4 annotierte Frames
-2025-12-02 15:48:09,473 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:48:09,567 - __main__ - INFO - Alle Tasks fertig
-2025-12-02 15:50:42,659 - __main__ - INFO - 3D-Scanner wird gestartet...
-2025-12-02 15:50:44,585 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
-2025-12-02 15:50:45,598 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 15:50:47,475 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:50:49,065 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:50:50,582 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:50:52,163 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:50:55,144 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'int'>
-2025-12-02 15:50:55,145 - __main__ - INFO - Gewicht: 5
-2025-12-02 15:50:59,460 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 15:50:59,780 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
-2025-12-02 15:50:59,780 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
-2025-12-02 15:51:01,057 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:51:01,058 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:51:01,058 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:51:01,059 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:51:02,530 - __main__ - INFO - Bild 0: YOLO erkannt - 82 x 106
-2025-12-02 15:51:02,531 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
-2025-12-02 15:51:04,779 - __main__ - INFO - Bild 1: YOLO erkannt - 67 x 95
-2025-12-02 15:51:04,780 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
-2025-12-02 15:51:07,032 - __main__ - INFO - Bild 2: YOLO erkannt - 403 x 321
-2025-12-02 15:51:07,033 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
-2025-12-02 15:51:09,277 - __main__ - INFO - Bild 3: YOLO erkannt - 411 x 322
-2025-12-02 15:51:09,278 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['82 x 106', '67 x 95', '403 x 321', '411 x 322']
-2025-12-02 15:51:09,279 - __main__ - INFO - Ergebnis von Abmessung erhalten: Typ=<class 'list'>
-2025-12-02 15:51:09,279 - __main__ - INFO - Abmessungen erhalten: ['82 x 106', '67 x 95', '403 x 321', '411 x 322']
-2025-12-02 15:51:09,279 - __main__ - INFO - Gesamt-Abmessung berechnet: 82 x 82 x 106
-2025-12-02 15:51:09,281 - __main__ - INFO - Ergebnis von yolo_frames erhalten: Typ=<class 'list'>
-2025-12-02 15:51:09,281 - __main__ - INFO - Erhalte 4 annotierte Frames
-2025-12-02 15:51:09,283 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:51:09,371 - __main__ - INFO - Alle Tasks fertig
-2025-12-02 15:54:46,867 - __main__ - INFO - 3D-Scanner wird gestartet...
-2025-12-02 15:54:48,862 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
-2025-12-02 15:54:50,766 - __main__ - INFO - go_next: Aktuelle Seite 0, scan_start=False
-2025-12-02 15:54:50,767 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 15:54:52,680 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:54:54,268 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:54:55,867 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:54:57,448 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:54:58,679 - __main__ - INFO - go_next: Aktuelle Seite 1, scan_start=True
-2025-12-02 15:54:58,719 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'int'>
-2025-12-02 15:54:58,720 - __main__ - INFO - Gewicht: 5
-2025-12-02 15:55:02,925 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 15:55:03,136 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
-2025-12-02 15:55:03,203 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
-2025-12-02 15:55:04,432 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:55:04,433 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:55:04,433 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:55:04,434 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:55:06,105 - __main__ - INFO - Bild 0: YOLO erkannt - 437 x 332
-2025-12-02 15:55:06,106 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
-2025-12-02 15:55:08,388 - __main__ - INFO - Bild 1: YOLO erkannt - 41 x 43
-2025-12-02 15:55:08,389 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
-2025-12-02 15:55:10,730 - __main__ - INFO - Bild 2: YOLO erkannt - 431 x 331
-2025-12-02 15:55:10,731 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
-2025-12-02 15:55:13,021 - __main__ - INFO - Bild 3: YOLO erkannt - 436 x 331
-2025-12-02 15:55:13,022 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['437 x 332', '41 x 43', '431 x 331', '436 x 331']
-2025-12-02 15:55:13,023 - __main__ - INFO - Ergebnis von Abmessung erhalten: Typ=<class 'list'>
-2025-12-02 15:55:13,023 - __main__ - INFO - Abmessungen erhalten: ['437 x 332', '41 x 43', '431 x 331', '436 x 331']
-2025-12-02 15:55:13,023 - __main__ - INFO - Gesamt-Abmessung berechnet: 437 x 437 x 332
-2025-12-02 15:55:13,024 - __main__ - INFO - Ergebnis von yolo_frames erhalten: Typ=<class 'list'>
-2025-12-02 15:55:13,024 - __main__ - INFO - Erhalte 4 annotierte Frames
-2025-12-02 15:55:13,026 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:13,112 - __main__ - INFO - Alle Tasks fertig
-2025-12-02 15:55:15,606 - __main__ - INFO - go_next: Aktuelle Seite 2, scan_start=False
-2025-12-02 15:55:16,981 - __main__ - INFO - go_back: Aktuelle Seite 3, scan_start=False
-2025-12-02 15:55:17,736 - __main__ - INFO - go_back: Aktuelle Seite 2, scan_start=False
-2025-12-02 15:55:17,737 - __main__ - INFO - Zurück zur Foto-Auswahl: scan_start=True gesetzt
-2025-12-02 15:55:18,813 - __main__ - INFO - go_next: Aktuelle Seite 1, scan_start=True
-2025-12-02 15:55:18,820 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
-2025-12-02 15:55:18,821 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
-2025-12-02 15:55:18,854 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'int'>
-2025-12-02 15:55:18,901 - __main__ - INFO - Gewicht: 5
-2025-12-02 15:55:18,903 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:19,227 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 15:55:20,879 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:55:20,879 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:21,006 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:55:21,007 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:21,110 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:55:21,111 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:21,222 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:55:21,222 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:21,702 - __main__ - INFO - Bild 0: YOLO erkannt - 437 x 332
-2025-12-02 15:55:21,703 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
-2025-12-02 15:55:24,036 - __main__ - INFO - Bild 1: YOLO erkannt - 41 x 43
-2025-12-02 15:55:24,037 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
-2025-12-02 15:55:26,367 - __main__ - INFO - Bild 2: YOLO erkannt - 431 x 331
-2025-12-02 15:55:26,368 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
-2025-12-02 15:55:28,708 - __main__ - INFO - Bild 3: YOLO erkannt - 436 x 331
-2025-12-02 15:55:28,709 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['437 x 332', '41 x 43', '431 x 331', '436 x 331']
-2025-12-02 15:55:29,329 - __main__ - INFO - go_next: Aktuelle Seite 1, scan_start=True
-2025-12-02 15:55:29,337 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
-2025-12-02 15:55:29,337 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
-2025-12-02 15:55:29,359 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'int'>
-2025-12-02 15:55:29,364 - __main__ - INFO - Gewicht: 5
-2025-12-02 15:55:29,366 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:29,715 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 15:55:31,153 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:55:31,154 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:31,295 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:55:31,296 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:31,417 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:55:31,418 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:31,510 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:55:31,511 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:32,027 - __main__ - INFO - Bild 0: YOLO erkannt - 437 x 332
-2025-12-02 15:55:32,029 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
-2025-12-02 15:55:34,436 - __main__ - INFO - Bild 1: YOLO erkannt - 41 x 43
-2025-12-02 15:55:34,437 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
-2025-12-02 15:55:36,949 - __main__ - INFO - Bild 2: YOLO erkannt - 431 x 331
-2025-12-02 15:55:36,950 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
-2025-12-02 15:55:39,385 - __main__ - INFO - Bild 3: YOLO erkannt - 436 x 331
-2025-12-02 15:55:39,387 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['437 x 332', '41 x 43', '431 x 331', '436 x 331']
-2025-12-02 15:55:39,388 - __main__ - INFO - Ergebnis von Abmessung erhalten: Typ=<class 'list'>
-2025-12-02 15:55:39,388 - __main__ - INFO - Abmessungen erhalten: ['437 x 332', '41 x 43', '431 x 331', '436 x 331']
-2025-12-02 15:55:39,389 - __main__ - INFO - Gesamt-Abmessung berechnet: 437 x 437 x 332
-2025-12-02 15:55:39,389 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:39,467 - __main__ - INFO - Ergebnis von yolo_frames erhalten: Typ=<class 'list'>
-2025-12-02 15:55:39,467 - __main__ - INFO - Erhalte 4 annotierte Frames
-2025-12-02 15:55:39,468 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:55:39,544 - __main__ - INFO - Alle Tasks fertig
-2025-12-02 15:56:16,082 - __main__ - INFO - go_back: Aktuelle Seite 2, scan_start=False
-2025-12-02 15:56:16,083 - __main__ - INFO - Zurück zur Foto-Auswahl: scan_start=True gesetzt
-2025-12-02 15:56:16,753 - __main__ - INFO - go_next: Aktuelle Seite 1, scan_start=True
-2025-12-02 15:56:16,761 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
-2025-12-02 15:56:16,761 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
-2025-12-02 15:56:16,819 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'int'>
-2025-12-02 15:56:16,888 - __main__ - INFO - Gewicht: 5
-2025-12-02 15:56:16,890 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:56:17,236 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 15:56:19,293 - __main__ - INFO - go_back: Aktuelle Seite 1, scan_start=True
-2025-12-02 15:56:19,918 - __main__ - INFO - Bild 0: YOLO erkannt - 437 x 332
-2025-12-02 15:56:19,919 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
-2025-12-02 15:56:20,942 - __main__ - INFO - go_next: Aktuelle Seite 0, scan_start=False
-2025-12-02 15:56:20,943 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 15:56:22,265 - __main__ - INFO - Bild 1: YOLO erkannt - 41 x 43
-2025-12-02 15:56:22,266 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
-2025-12-02 15:56:23,640 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:56:24,748 - __main__ - INFO - Bild 2: YOLO erkannt - 431 x 331
-2025-12-02 15:56:24,749 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
-2025-12-02 15:56:25,928 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:56:27,062 - __main__ - INFO - Bild 3: YOLO erkannt - 436 x 331
-2025-12-02 15:56:27,063 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['437 x 332', '41 x 43', '431 x 331', '436 x 331']
-2025-12-02 15:56:27,790 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:56:28,769 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:57:35,976 - __main__ - INFO - 3D-Scanner wird gestartet...
-2025-12-02 15:57:38,355 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
-2025-12-02 15:57:40,269 - __main__ - INFO - go_next: Aktuelle Seite 0, scan_start=False
-2025-12-02 15:57:40,270 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 15:57:42,077 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:57:43,659 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:57:45,225 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:57:46,759 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 15:57:48,533 - __main__ - INFO - Sprache geändert zu: it
-2025-12-02 15:57:49,734 - __main__ - INFO - go_next: Aktuelle Seite 1, scan_start=True
-2025-12-02 15:57:49,773 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'int'>
-2025-12-02 15:57:49,775 - __main__ - INFO - Gewicht: 5
-2025-12-02 15:57:54,054 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 15:57:54,328 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
-2025-12-02 15:57:54,343 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
-2025-12-02 15:57:55,536 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:57:55,537 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:57:55,538 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:57:55,539 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 15:57:57,135 - __main__ - INFO - Bild 0: YOLO erkannt - 412 x 320
-2025-12-02 15:57:57,137 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
-2025-12-02 15:57:59,449 - __main__ - INFO - Bild 1: YOLO erkannt - 414 x 320
-2025-12-02 15:57:59,450 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
-2025-12-02 15:58:01,723 - __main__ - INFO - Bild 2: YOLO erkannt - 414 x 320
-2025-12-02 15:58:01,725 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
-2025-12-02 15:58:04,157 - __main__ - INFO - Bild 3: YOLO erkannt - 399 x 316
-2025-12-02 15:58:04,158 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['412 x 320', '414 x 320', '414 x 320', '399 x 316']
-2025-12-02 15:58:04,159 - __main__ - INFO - Ergebnis von Abmessung erhalten: Typ=<class 'list'>
-2025-12-02 15:58:04,159 - __main__ - INFO - Abmessungen erhalten: ['412 x 320', '414 x 320', '414 x 320', '399 x 316']
-2025-12-02 15:58:04,160 - __main__ - INFO - Gesamt-Abmessung berechnet: 412 x 412 x 320
-2025-12-02 15:58:04,160 - __main__ - INFO - Ergebnis von yolo_frames erhalten: Typ=<class 'list'>
-2025-12-02 15:58:04,160 - __main__ - INFO - Erhalte 4 annotierte Frames
-2025-12-02 15:58:04,163 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 15:58:04,246 - __main__ - INFO - Alle Tasks fertig
-2025-12-02 15:58:13,304 - __main__ - INFO - go_next: Aktuelle Seite 2, scan_start=False
-2025-12-02 15:58:14,722 - __main__ - INFO - go_next: Aktuelle Seite 3, scan_start=False
-2025-12-02 15:58:14,723 - __main__ - INFO - Bereits auf letzter Seite
-2025-12-02 15:58:15,146 - __main__ - INFO - go_back: Aktuelle Seite 3, scan_start=False
-2025-12-02 15:58:15,568 - __main__ - INFO - go_back: Aktuelle Seite 2, scan_start=False
-2025-12-02 15:58:15,569 - __main__ - INFO - Zurück zur Foto-Auswahl: scan_start=True gesetzt
-2025-12-02 15:58:16,239 - __main__ - INFO - go_back: Aktuelle Seite 1, scan_start=True
-2025-12-02 15:58:20,816 - __main__ - INFO - Sprache geändert zu: de
-2025-12-02 15:58:23,381 - __main__ - INFO - Speicher-Prüfung gestartet
-2025-12-02 16:04:33,746 - __main__ - INFO - 3D-Scanner wird gestartet...
-2025-12-02 16:04:35,658 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
-2025-12-02 16:04:36,634 - __main__ - INFO - go_next: Aktuelle Seite 0, scan_start=False
-2025-12-02 16:04:36,634 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
-2025-12-02 16:04:38,520 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 16:04:40,104 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 16:04:41,107 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 16:04:42,565 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
-2025-12-02 16:04:44,342 - __main__ - INFO - go_next: Aktuelle Seite 1, scan_start=True
-2025-12-02 16:04:44,380 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'int'>
-2025-12-02 16:04:44,382 - __main__ - INFO - Gewicht: 5
-2025-12-02 16:04:48,721 - __main__ - INFO - YOLO-Modell geladen von YOLOV8s_Barcode_Detection.pt
-2025-12-02 16:04:48,965 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
-2025-12-02 16:04:48,971 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
-2025-12-02 16:04:50,400 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 16:04:50,400 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 16:04:50,401 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 16:04:50,401 - __main__ - INFO - Ergebnis von barcode erhalten: Typ=<class 'dict'>
-2025-12-02 16:04:51,986 - __main__ - INFO - Bild 0: YOLO erkannt - 411 x 343
-2025-12-02 16:04:51,987 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
-2025-12-02 16:04:54,391 - __main__ - INFO - Bild 1: YOLO erkannt - 416 x 320
-2025-12-02 16:04:54,392 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
-2025-12-02 16:04:56,746 - __main__ - INFO - Bild 2: YOLO erkannt - 405 x 320
-2025-12-02 16:04:56,747 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
-2025-12-02 16:04:59,022 - __main__ - INFO - Bild 3: YOLO erkannt - 416 x 320
-2025-12-02 16:04:59,023 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['411 x 343', '416 x 320', '405 x 320', '416 x 320']
-2025-12-02 16:04:59,024 - __main__ - INFO - Ergebnis von Abmessung erhalten: Typ=<class 'list'>
-2025-12-02 16:04:59,024 - __main__ - INFO - Abmessungen erhalten: ['411 x 343', '416 x 320', '405 x 320', '416 x 320']
-2025-12-02 16:04:59,025 - __main__ - INFO - Gesamt-Abmessung berechnet: 411 x 411 x 343
-2025-12-02 16:04:59,025 - __main__ - INFO - Ergebnis von yolo_frames erhalten: Typ=<class 'list'>
-2025-12-02 16:04:59,026 - __main__ - INFO - Erhalte 4 annotierte Frames
-2025-12-02 16:04:59,026 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
-2025-12-02 16:04:59,108 - __main__ - INFO - Alle Tasks fertig
+2026-01-04 12:52:33,118 - __main__ - INFO - 3D-Scanner wird gestartet...
+2026-01-04 12:52:34,846 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
+2026-01-04 12:52:37,200 - __main__ - INFO - go_next: Aktuelle Seite 0, scan_start=False
+2026-01-04 12:52:37,201 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
+2026-01-04 12:52:38,620 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2026-01-04 12:52:39,821 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2026-01-04 12:52:40,986 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2026-01-04 12:52:42,125 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2026-01-04 12:52:44,111 - __main__ - INFO - go_next: Aktuelle Seite 1, scan_start=True
+2026-01-04 12:52:44,150 - __main__ - ERROR - Gewichtsmodul nicht verfügbar: No module named 'board'
+2026-01-04 12:52:44,151 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'str'>
+2026-01-04 12:52:44,151 - __main__ - INFO - Gewicht: Undefiniert
+2026-01-04 12:52:44,151 - __main__ - INFO - Barcodes vorhanden - aktualisiere GUI
+2026-01-04 12:52:48,419 - __main__ - INFO - Sprache geändert zu: it
+2026-01-04 12:52:48,626 - workers.BarCode_v02 - ERROR - Fehler beim Laden des YOLO-Modells: [Errno 2] No such file or directory: 'YOLOV8s_Barcode_Detection.pt'
+2026-01-04 12:52:48,626 - __main__ - INFO - Analysiere Bild 0 (iso_Bild) auf Barcodes...
+2026-01-04 12:52:48,626 - workers.BarCode_v02 - ERROR - YOLO-Modell nicht verfügbar
+2026-01-04 12:52:48,626 - __main__ - INFO - Bild 0: Keine Barcodes erkannt
+2026-01-04 12:52:48,626 - __main__ - INFO - Analysiere Bild 1 (top_Bild) auf Barcodes...
+2026-01-04 12:52:48,626 - workers.BarCode_v02 - ERROR - YOLO-Modell nicht verfügbar
+2026-01-04 12:52:48,627 - __main__ - INFO - Bild 1: Keine Barcodes erkannt
+2026-01-04 12:52:48,627 - __main__ - INFO - Analysiere Bild 2 (right_Bild) auf Barcodes...
+2026-01-04 12:52:48,627 - workers.BarCode_v02 - ERROR - YOLO-Modell nicht verfügbar
+2026-01-04 12:52:48,627 - __main__ - INFO - Bild 2: Keine Barcodes erkannt
+2026-01-04 12:52:48,627 - __main__ - INFO - Analysiere Bild 3 (behind_Bild) auf Barcodes...
+2026-01-04 12:52:48,627 - workers.BarCode_v02 - ERROR - YOLO-Modell nicht verfügbar
+2026-01-04 12:52:48,627 - __main__ - INFO - Bild 3: Keine Barcodes erkannt
+2026-01-04 12:52:48,627 - __main__ - INFO - Insgesamt 0 Barcodes in 4 Bildern erkannt
+2026-01-04 12:52:49,790 - __main__ - INFO - go_next: Aktuelle Seite 1, scan_start=True
+2026-01-04 12:52:49,803 - __main__ - ERROR - Gewichtsmodul nicht verfügbar: No module named 'board'
+2026-01-04 12:52:49,807 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'str'>
+2026-01-04 12:52:49,807 - __main__ - INFO - Gewicht: Undefiniert
+2026-01-04 12:52:49,807 - __main__ - INFO - Barcodes vorhanden - aktualisiere GUI
+2026-01-04 12:52:50,190 - workers.BarCode_v02 - ERROR - Fehler beim Laden des YOLO-Modells: [Errno 2] No such file or directory: 'YOLOV8s_Barcode_Detection.pt'
+2026-01-04 12:52:50,190 - __main__ - INFO - Analysiere Bild 0 (iso_Bild) auf Barcodes...
+2026-01-04 12:52:50,190 - workers.BarCode_v02 - ERROR - YOLO-Modell nicht verfügbar
+2026-01-04 12:52:50,190 - __main__ - INFO - Bild 0: Keine Barcodes erkannt
+2026-01-04 12:52:50,192 - __main__ - INFO - Analysiere Bild 1 (top_Bild) auf Barcodes...
+2026-01-04 12:52:50,192 - workers.BarCode_v02 - ERROR - YOLO-Modell nicht verfügbar
+2026-01-04 12:52:50,192 - __main__ - INFO - Bild 1: Keine Barcodes erkannt
+2026-01-04 12:52:50,192 - __main__ - INFO - Analysiere Bild 2 (right_Bild) auf Barcodes...
+2026-01-04 12:52:50,192 - workers.BarCode_v02 - ERROR - YOLO-Modell nicht verfügbar
+2026-01-04 12:52:50,192 - __main__ - INFO - Bild 2: Keine Barcodes erkannt
+2026-01-04 12:52:50,193 - __main__ - INFO - Analysiere Bild 3 (behind_Bild) auf Barcodes...
+2026-01-04 12:52:50,193 - workers.BarCode_v02 - ERROR - YOLO-Modell nicht verfügbar
+2026-01-04 12:52:50,193 - __main__ - INFO - Bild 3: Keine Barcodes erkannt
+2026-01-04 12:52:50,193 - __main__ - INFO - Insgesamt 0 Barcodes in 4 Bildern erkannt
+2026-01-04 12:53:20,201 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
+2026-01-04 12:53:20,201 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
+2026-01-04 12:53:20,201 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
+2026-01-04 12:53:20,201 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
+2026-01-04 12:53:20,250 - __main__ - ERROR - Fehler bei YOLO-Erkennung Bild 0: bn
+Traceback (most recent call last):
+  File "c:\Users\grane\Felix_Schule\Diplomarbeit\3D_Scanner\Python_Files\_Prototyp_exe\Interface_v08.py", line 337, in run_yolo_detection
+    boxes_info = yolo_module.get_boxes_and_dimensions(frame_rgb)
+  File "c:\Users\grane\Felix_Schule\Diplomarbeit\3D_Scanner\Python_Files\_Prototyp_exe\workers\BoundingBox_Yolo03.py", line 17, in get_boxes_and_dimensions
+    results = model.predict(frame, imgsz=imgsz)[0]
+  File "C:\Users\grane\AppData\Local\Programs\Python\Python310\lib\site-packages\ultralytics\engine\model.py", line 550, in predict
+    self.predictor.setup_model(model=self.model, verbose=is_cli)
+  File "C:\Users\grane\AppData\Local\Programs\Python\Python310\lib\site-packages\ultralytics\engine\predictor.py", line 397, in setup_model
+    self.model = AutoBackend(
+  File "C:\Users\grane\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\utils\_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "C:\Users\grane\AppData\Local\Programs\Python\Python310\lib\site-packages\ultralytics\nn\autobackend.py", line 203, in __init__
+    model = model.fuse(verbose=verbose)
+  File "C:\Users\grane\AppData\Local\Programs\Python\Python310\lib\site-packages\ultralytics\nn\tasks.py", line 238, in fuse
+    delattr(m, "bn")  # remove batchnorm
+  File "C:\Users\grane\AppData\Local\Programs\Python\Python310\lib\site-packages\torch\nn\modules\module.py", line 2077, in __delattr__
+    super().__delattr__(name)
+AttributeError: bn
+2026-01-04 12:53:20,416 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
+2026-01-04 12:53:24,307 - __main__ - INFO - Bild 0: YOLO erkannt - 339 x 310
+2026-01-04 12:53:24,318 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
+2026-01-04 12:53:26,318 - __main__ - INFO - Bild 1: YOLO erkannt - 405 x 325
+2026-01-04 12:53:26,319 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
+2026-01-04 12:53:28,205 - __main__ - INFO - Bild 1: YOLO erkannt - 405 x 325
+2026-01-04 12:53:28,207 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
+2026-01-04 12:53:30,029 - __main__ - INFO - Bild 2: YOLO erkannt - 340 x 346
+2026-01-04 12:53:30,030 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
+2026-01-04 12:53:31,865 - __main__ - INFO - Bild 2: YOLO erkannt - 340 x 346
+2026-01-04 12:53:31,866 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
+2026-01-04 12:53:33,740 - __main__ - INFO - Bild 3: YOLO erkannt - 321 x 296
+2026-01-04 12:53:33,741 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['0 x 0', '405 x 325', '340 x 346', '321 x 296']
+2026-01-04 12:53:33,742 - __main__ - INFO - Ergebnis von Abmessung erhalten: Typ=<class 'list'>
+2026-01-04 12:53:33,742 - __main__ - INFO - Abmessungen erhalten: ['0 x 0', '405 x 325', '340 x 346', '321 x 296']
+2026-01-04 12:53:33,743 - __main__ - INFO - Gesamt-Abmessung berechnet: 405 x 405 x 325
+2026-01-04 12:53:33,743 - __main__ - INFO - Barcodes vorhanden - aktualisiere GUI
+2026-01-04 12:53:33,909 - __main__ - INFO - Ergebnis von yolo_frames erhalten: Typ=<class 'list'>
+2026-01-04 12:53:33,911 - __main__ - INFO - Erhalte 4 annotierte Frames
+2026-01-04 12:53:33,912 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
+2026-01-04 12:53:34,072 - __main__ - INFO - Alle Tasks fertig
+2026-01-04 12:53:35,751 - __main__ - INFO - Bild 3: YOLO erkannt - 321 x 296
+2026-01-04 12:53:35,752 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['339 x 310', '405 x 325', '340 x 346', '321 x 296']
+2026-01-04 12:53:42,800 - __main__ - INFO - go_next: Aktuelle Seite 2, scan_start=False
+2026-01-04 12:53:48,135 - __main__ - INFO - Daten gespeichert: 0 EANs, 0 Artikelnummern
+2026-01-04 13:01:39,476 - __main__ - INFO - 3D-Scanner wird gestartet...
+2026-01-04 13:01:40,676 - __main__ - INFO - Verfügbare Kameras gefunden: [0]
+2026-01-04 13:01:41,817 - __main__ - INFO - go_next: Aktuelle Seite 0, scan_start=False
+2026-01-04 13:01:41,817 - __main__ - INFO - Starte Bildaufnahme von allen Kameras
+2026-01-04 13:01:43,022 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2026-01-04 13:01:44,173 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2026-01-04 13:01:45,313 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2026-01-04 13:01:46,526 - __main__ - INFO - Bild erfolgreich von Kamera 0 aufgenommen
+2026-01-04 13:01:47,632 - __main__ - INFO - go_next: Aktuelle Seite 1, scan_start=True
+2026-01-04 13:01:47,650 - __main__ - ERROR - Gewichtsmodul nicht verfügbar: No module named 'board'
+2026-01-04 13:01:47,651 - __main__ - INFO - Ergebnis von weight erhalten: Typ=<class 'str'>
+2026-01-04 13:01:47,651 - __main__ - INFO - Gewicht: Undefiniert
+2026-01-04 13:01:47,652 - __main__ - INFO - Barcodes vorhanden - aktualisiere GUI
+2026-01-04 13:01:49,621 - __main__ - INFO - BoundingBox_Yolo03 erfolgreich importiert
+2026-01-04 13:01:49,623 - __main__ - INFO - Verarbeite Bild 0 für YOLO-Erkennung
+2026-01-04 13:01:50,069 - workers.BarCode_v02 - ERROR - Fehler beim Laden des YOLO-Modells: [Errno 2] No such file or directory: 'YOLOV8s_Barcode_Detection.pt'
+2026-01-04 13:01:50,070 - __main__ - INFO - Analysiere Bild 0 (iso_Bild) auf Barcodes...
+2026-01-04 13:01:50,071 - workers.BarCode_v02 - ERROR - YOLO-Modell nicht verfügbar
+2026-01-04 13:01:50,071 - __main__ - INFO - Bild 0: Keine Barcodes erkannt
+2026-01-04 13:01:50,071 - __main__ - INFO - Analysiere Bild 1 (top_Bild) auf Barcodes...
+2026-01-04 13:01:50,071 - workers.BarCode_v02 - ERROR - YOLO-Modell nicht verfügbar
+2026-01-04 13:01:50,072 - __main__ - INFO - Bild 1: Keine Barcodes erkannt
+2026-01-04 13:01:50,072 - __main__ - INFO - Analysiere Bild 2 (right_Bild) auf Barcodes...
+2026-01-04 13:01:50,072 - workers.BarCode_v02 - ERROR - YOLO-Modell nicht verfügbar
+2026-01-04 13:01:50,072 - __main__ - INFO - Bild 2: Keine Barcodes erkannt
+2026-01-04 13:01:50,073 - __main__ - INFO - Analysiere Bild 3 (behind_Bild) auf Barcodes...
+2026-01-04 13:01:50,073 - workers.BarCode_v02 - ERROR - YOLO-Modell nicht verfügbar
+2026-01-04 13:01:50,073 - __main__ - INFO - Bild 3: Keine Barcodes erkannt
+2026-01-04 13:01:50,073 - __main__ - INFO - Insgesamt 0 Barcodes in 4 Bildern erkannt
+2026-01-04 13:01:51,696 - __main__ - INFO - Bild 0: YOLO erkannt - 342 x 239
+2026-01-04 13:01:51,697 - __main__ - INFO - Verarbeite Bild 1 für YOLO-Erkennung
+2026-01-04 13:01:53,540 - __main__ - INFO - Bild 1: YOLO erkannt - 399 x 317
+2026-01-04 13:01:53,541 - __main__ - INFO - Verarbeite Bild 2 für YOLO-Erkennung
+2026-01-04 13:01:55,405 - __main__ - INFO - Bild 2: YOLO erkannt - 399 x 317
+2026-01-04 13:01:55,406 - __main__ - INFO - Verarbeite Bild 3 für YOLO-Erkennung
+2026-01-04 13:01:57,264 - __main__ - INFO - Bild 3: YOLO erkannt - 400 x 317
+2026-01-04 13:01:57,264 - __main__ - INFO - YOLO-Erkennung abgeschlossen. Dimensionen: ['342 x 239', '399 x 317', '399 x 317', '400 x 317']
+2026-01-04 13:01:57,266 - __main__ - INFO - Ergebnis von Abmessung erhalten: Typ=<class 'list'>
+2026-01-04 13:01:57,266 - __main__ - INFO - Abmessungen erhalten: ['342 x 239', '399 x 317', '399 x 317', '400 x 317']
+2026-01-04 13:01:57,266 - __main__ - INFO - Gesamt-Abmessung berechnet: 342 x 342 x 239
+2026-01-04 13:01:57,266 - __main__ - INFO - Barcodes vorhanden - aktualisiere GUI
+2026-01-04 13:01:57,326 - __main__ - INFO - Ergebnis von yolo_frames erhalten: Typ=<class 'list'>
+2026-01-04 13:01:57,326 - __main__ - INFO - Erhalte 4 annotierte Frames
+2026-01-04 13:01:57,327 - __main__ - INFO - YOLO-Frames vorhanden - aktualisiere Bilder in GUI
+2026-01-04 13:01:57,384 - __main__ - INFO - Alle Tasks fertig
+2026-01-04 13:01:59,761 - __main__ - INFO - go_next: Aktuelle Seite 2, scan_start=False

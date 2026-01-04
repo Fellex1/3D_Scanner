@@ -1,10 +1,10 @@
 #Interface_v08.py
 """=======TODO-Liste v0.8=======
-Objekt-Detection muss verbessert werden
-Gewicht-Messung muss implementiert werden
+Objekt-Detection muss verbessert werden/Mit Bemassung der Distanz von der LIDAR-Kamera      !!!!!!!!!
+Gewicht-Messung muss implementiert werden                                                   !!!!!!!!!
 SAP-Integration                 (Platzhalter-Button/optional)
 Lokal speichern Integration     (Formatierung?)
-Artikel Nummer eingeben
+
 ================================"""
 
 import os
@@ -38,7 +38,7 @@ class AppConfig:
     DEFAULT_LANGUAGE: str = "de"
     GUI_RESOURCES_PATH: str = "GUI_Anzeige"
     LOG_LEVEL: str = "INFO"
-    YOLO_MODEL_PATH: str = "YOLOV8s_Barcode_Detection.pt"
+    YOLO_MODEL_PATH: str = "models/YOLOV8s_Barcode_Detection.pt"
     
     @classmethod
     def load_from_file(cls, config_path: str = "config.json"):
@@ -303,7 +303,7 @@ class DetectionManager:
         # Direkt importieren und verwenden
         try:
             # Importiere das Modul neu
-            import BoundingBox_Yolo03 as yolo_module
+            import workers.BoundingBox_Yolo03 as yolo_module
             logger.info("BoundingBox_Yolo03 erfolgreich importiert")
         except ImportError as e:
             logger.error(f"YOLO-Modul nicht gefunden: {e}")
@@ -375,7 +375,7 @@ class DetectionManager:
         """Erkennt alle Barcodes in den Bildern"""
         try:
             # Importiere die BarcodeDetector Klasse
-            from BarCode_v02 import BarcodeDetector
+            from workers.BarCode_v02 import BarcodeDetector
             
             # Initialisiere Detector
             detector = BarcodeDetector()
@@ -493,8 +493,8 @@ class ParallelWorker(QThread):
     def _run_weight_task(self):
         """Führt Gewichtsmessung durch"""
         try:
-            import Gewichts_Messung
-            weight = Gewichts_Messung.get_weight()
+            import workers.Gewichts_Messung
+            weight = workers.Gewichts_Messung.get_weight()
             return {"weight": weight}
         except ImportError as e:
             logger.error(f"Gewichtsmodul nicht verfügbar: {e}")

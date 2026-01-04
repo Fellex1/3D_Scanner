@@ -1,9 +1,16 @@
 # BoundingBox_Yolo03.py
-from ultralytics import YOLO
+import os
 import cv2
+from ultralytics import YOLO
 
-# --- Modell einmal laden ---
-model = YOLO("yolo12m.pt")  # mittlere Version
+# Modellpfad aus Umgebungsvariable lesen
+models_dir = os.environ.get('MODELS_DIR', 'models')
+model_path = os.path.join(models_dir, "yolo12m.pt")
+
+#print(f"Models directory: {models_dir}")
+#print(f"Model path: {model_path}")
+
+model = YOLO(model_path)
 
 def capture_frame(camera_index=0):
     cap = cv2.VideoCapture(camera_index)
